@@ -72,11 +72,6 @@ class WebhookAgent {
       .tmplVar({
         webhookId
       })
-      .catch((err) => {
-        const fErr = this.intercomClient.handleError(err);
-        // handle errors which may happen here
-        return Promise.reject(fErr);
-      })
       .then((res) => {
         this.webhookId = res.body.id;
         return this.helpers.updateSettings({

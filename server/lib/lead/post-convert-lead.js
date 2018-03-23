@@ -14,9 +14,8 @@ function postConvertLead(ctx: Object, user: Object): Promise {
       return response.body;
     })
     .catch((err) => {
-      const fErr = service.intercomClient.handleError(err);
-      client.logger.error("postConvertLead.error", fErr);
-      return Promise.resolve(fErr);
+      client.logger.error("postConvertLead.error", err);
+      return Promise.resolve(err);
     });
 }
 

@@ -39,9 +39,8 @@ function getRecentLeads(ctx: Object, options: Object): Object {
       };
     })
     .catch((err) => {
-      const fErr = intercomClient.handleError(err);
-      client.logger.error("getRecentLeads.error", fErr);
-      return Promise.reject(fErr);
+      client.logger.error("getRecentLeads.error", err);
+      return Promise.reject(err);
     });
 }
 

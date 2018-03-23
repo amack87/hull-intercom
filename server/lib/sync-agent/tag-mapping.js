@@ -121,14 +121,12 @@ class TagMapping {
         return Promise.resolve();
       })
       .catch((err) => {
-        const fErr = this.intercomClient.handleError(err);
-
-        if (fErr.statusCode === 404) {
+        if (err.statusCode === 404) {
           _.unset(this.mapping, segment.id);
           return Promise.resolve();
         }
 
-        if (fErr.statusCode === 400) {
+        if (err.statusCode === 400) {
           this.logger.error("sync.error", {
             error: "Unable to delete tag",
             segment: segment.id,
@@ -138,7 +136,7 @@ class TagMapping {
           return Promise.resolve();
         }
 
-        return Promise.reject(fErr);
+        return Promise.reject(err);
       });
   }
 }

@@ -27,20 +27,18 @@ function getLeadsScroll(ctx, scroll_param = null, updated_after, updated_before)
       return { leads: contacts, scroll_param: next_scroll_param };
     })
     .catch((err) => {
-      const fErr = intercomClient.handleError(err);
-
-      if (_.get(fErr, "body.errors[0].code") === "scroll_exists") {
+      if (_.get(err, "body.errors[0].code") === "scroll_exists") {
         client.logger.error("incoming.job.error", { jobName: "fetchAllLeads", errors: "Trying to perform two separate scrolls" });
         return Promise.resolve([]);
       }
 
-      if (_.get(fErr, "body.errors[0].code") === "not_found") {
+      if (_.get(err, "body.errors[0].code") === "not_found") {
         client.logger.warn("incoming.job.warning", { jobName: "fetchAllLeads", errors: "Scroll expired, what could mean the end of the list" });
         return Promise.resolve([]);
       }
 
       // handle errors which may happen here
-      return Promise.reject(fErr);
+      return Promise.reject(err);
     });
 }
 

@@ -1,5 +1,6 @@
 const Promise = require("bluebird");
 const _ = require("lodash");
+const { ConfigurationError } = require("hull/lib/errors");
 
 const handleRateLimitError = require("../lib/handle-rate-limit-error");
 
@@ -52,7 +53,10 @@ function sendUsers(ctx, payload) {
       }
       return Promise.resolve();
     })
-    .catch(err => handleRateLimitError(ctx, "sendUsers", payload, err));
+    .catch(err => handleRateLimitError(ctx, "sendUsers", payload, err))
+    .catch(ConfigurationError, () => {
+      return Promise.resolve();
+    });
 }
 
 module.exports = sendUsers;

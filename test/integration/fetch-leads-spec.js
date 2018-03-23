@@ -69,15 +69,15 @@ describe("fetchLeads", function test() {
 
   it("should skip the fetch operation in case of rate limit error", (done) => {
     const contactsStub = miniintercom.stubApp("/contacts")
-    .onFirstCall().callsFake((req, res) => {
-      res.status(429).end();
-    });
+      .onFirstCall().callsFake((req, res) => {
+        res.status(429).end();
+      });
 
     minihull.postConnector("123456789012345678901234", "http://localhost:8000/fetch-leads")
-    .then(() => {
-      expect(contactsStub.callCount).to.equal(1);
-      done();
-    });
+      .then(() => {
+        expect(contactsStub.callCount).to.equal(1);
+        done();
+      });
   });
 
   afterEach(() => {

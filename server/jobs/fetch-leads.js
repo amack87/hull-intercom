@@ -1,6 +1,7 @@
 // @flow
 const moment = require("moment");
 const Promise = require("bluebird");
+const { RateLimitError, ConfigurationError } = require("hull/lib/errors");
 
 const saveLeads = require("./save-leads");
 const getRecentLeads = require("../lib/lead/get-recent-leads");
@@ -53,7 +54,10 @@ function fetchLeads(ctx: Object, payload: Object) {
       }
       return Promise.all(promises);
     })
+    .catch(RateLimitError, () => Promise.resolve("ok"))
+    .catch(ConfigurationError, () => Promise.resolve("ok"))
     .catch((err) => {
+      // deprecated statusCode, effectively replaced by catch above
       if (err.statusCode === 429) {
         return Promise.resolve("ok");
       }
