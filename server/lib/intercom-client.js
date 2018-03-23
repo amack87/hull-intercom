@@ -96,21 +96,21 @@ class IntercomClient {
 
   get(url, query) {
     if (!this.ifConfigured()) {
-      throw new Error("Client access data not set!");
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
     }
     return this.agent.get(url).query(query);
   }
 
   post(url, params) {
     if (!this.ifConfigured()) {
-      throw new Error("Client access data not set!");
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
     }
     return this.agent.post(url).send(params);
   }
 
   delete(url, params) {
     if (!this.ifConfigured()) {
-      throw new Error("Client access data not set!");
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
     }
     return this.agent.delete(url).query(params);
   }
