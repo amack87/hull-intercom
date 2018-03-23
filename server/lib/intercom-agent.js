@@ -1,11 +1,11 @@
-import _ from "lodash";
-import Promise from "bluebird";
-import moment from "moment";
+const _ = require("lodash");
+const Promise = require("bluebird");
+const moment = require("moment");
 
 /**
  * Superset of Intercom API
  */
-export default class IntercomAgent {
+class IntercomAgent {
   constructor(intercomClient, { client, metric, cache }) {
     this.intercomClient = intercomClient;
     this.client = client;
@@ -256,3 +256,5 @@ export default class IntercomAgent {
     });
   }
 }
+
+module.exports = IntercomAgent;

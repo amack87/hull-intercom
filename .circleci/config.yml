@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:8.9
+      - image: circleci/node:8.10
     working_directory: ~/repo
     steps:
       - checkout
@@ -17,4 +17,4 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: yarn test
-      # - run: ./node_modules/.bin/hull-connector-tester
+      - run: npm i --no-save --no-cache hull-connector-tester@latest && hull-connector-tester

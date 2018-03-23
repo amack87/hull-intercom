@@ -1,8 +1,8 @@
 // @flow
-import _ from "lodash";
-import moment from "moment";
+const _ = require("lodash");
+const moment = require("moment");
 
-export default function getRecentLeads(ctx: Object, options: Object): Object {
+function getRecentLeads(ctx: Object, options: Object): Object {
   const { client } = ctx;
   const { intercomClient } = ctx.service;
   const {
@@ -44,3 +44,5 @@ export default function getRecentLeads(ctx: Object, options: Object): Object {
       return Promise.reject(fErr);
     });
 }
+
+module.exports = getRecentLeads;

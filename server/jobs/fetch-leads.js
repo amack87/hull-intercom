@@ -1,11 +1,11 @@
 // @flow
-import moment from "moment";
-import Promise from "bluebird";
+const moment = require("moment");
+const Promise = require("bluebird");
 
-import saveLeads from "./save-leads";
-import getRecentLeads from "../lib/lead/get-recent-leads";
+const saveLeads = require("./save-leads");
+const getRecentLeads = require("../lib/lead/get-recent-leads");
 
-export default function fetchLeads(ctx: Object, payload: Object) {
+function fetchLeads(ctx: Object, payload: Object) {
   const { ship, helpers } = ctx;
   const {
     updated_before,
@@ -60,3 +60,5 @@ export default function fetchLeads(ctx: Object, payload: Object) {
       return Promise.reject(err);
     });
 }
+
+module.exports = fetchLeads;

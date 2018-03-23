@@ -1,1 +1,1 @@
-export default from "./sync-agent";
+module.exports = require("./sync-agent");

@@ -1,7 +1,7 @@
 /* global describe, it */
-import assert from "assert";
-import IntercomClient from "../server/lib/intercom-client";
-import ClientMock from "./mocks/client-mock";
+const assert = require("assert");
+const IntercomClient = require("../../server/lib/intercom-client");
+const ClientMock = require("./mocks/client-mock");
 
 const hullMock = {
   ship: {

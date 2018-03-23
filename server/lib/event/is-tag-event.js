@@ -1,7 +1,7 @@
 // @flow
-import _ from "lodash";
+const _ = require("lodash");
 
-export default function isTagEvent(ctx: Object, intercomEvent: Object): boolean {
+function isTagEvent(ctx: Object, intercomEvent: Object): boolean {
   const { segments } = ctx;
   const { tagMapping } = ctx.service.syncAgent;
   if (_.includes(["user.tag.created", "user.tag.deleted"], intercomEvent.topic)
@@ -14,3 +14,5 @@ export default function isTagEvent(ctx: Object, intercomEvent: Object): boolean 
   }
   return false;
 }
+
+module.exports = isTagEvent;

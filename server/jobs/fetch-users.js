@@ -1,11 +1,11 @@
-import Promise from "bluebird";
-import moment from "moment";
-import _ from "lodash";
+const Promise = require("bluebird");
+const moment = require("moment");
+const _ = require("lodash");
 
-import saveUsers from "./save-users";
-import fetchAllUsers from "./fetch-all-users";
+const saveUsers = require("./save-users");
+const fetchAllUsers = require("./fetch-all-users");
 
-export default function fetchUsers(ctx, payload = {}) {
+function fetchUsers(ctx, payload = {}) {
   const { intercomAgent } = ctx.service;
   const { count = 50, page = 1 } = payload;
   let { last_updated_at } = payload;
@@ -74,3 +74,5 @@ export default function fetchUsers(ctx, payload = {}) {
       return Promise.reject(err);
     });
 }
+
+module.exports = fetchUsers;

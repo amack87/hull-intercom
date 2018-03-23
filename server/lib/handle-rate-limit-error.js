@@ -1,9 +1,9 @@
 // @flow
-import Promise from "bluebird";
-import _ from "lodash";
-import moment from "moment";
+const Promise = require("bluebird");
+const _ = require("lodash");
+const moment = require("moment");
 
-export default function handleRateLimitError(ctx: Object, jobName: String, payload: Object, err: Error): Promise {
+function handleRateLimitError(ctx: Object, jobName: String, payload: Object, err: Error): Promise {
   if (_.get(err, "statusCode") === 429 || _.get(err, "response.statusCode") === 429) {
     const resetIn = _.get(err, "response.header.x-ratelimit-reset")
       ? moment(_.get(err, "response.header.x-ratelimit-reset"), "X").diff()
@@ -21,3 +21,5 @@ export default function handleRateLimitError(ctx: Object, jobName: String, paylo
   }
   return Promise.reject(err);
 }
+
+module.exports = handleRateLimitError;

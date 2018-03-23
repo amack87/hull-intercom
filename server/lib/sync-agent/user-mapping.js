@@ -1,6 +1,6 @@
-import _ from "lodash";
+const _ = require("lodash");
 
-export default class UserMapping {
+class UserMapping {
   constructor(ctx) {
     this.ship = ctx.ship;
     /* eslint-disable quote-props, no-multi-spaces, key-spacing */
@@ -256,3 +256,5 @@ export default class UserMapping {
     return ident;
   }
 }
+
+module.exports = UserMapping;

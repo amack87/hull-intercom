@@ -1,15 +1,15 @@
 /* @flow */
-import { Router } from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import { notifHandler, responseMiddleware } from "hull/lib/utils";
+const { Router } = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const { notifHandler, responseMiddleware } = require("hull/lib/utils");
 
-import appMiddleware from "../lib/middleware/app-middleware";
-import requireConfiguration from "../lib/middleware/require-configuration";
-import * as notifHandlers from "./../notif-handlers";
-import * as actions from "./../actions";
+const appMiddleware = require("../lib/middleware/app-middleware");
+const requireConfiguration = require("../lib/middleware/require-configuration");
+const notifHandlers = require("./../notif-handlers");
+const actions = require("./../actions");
 
-export default function AppRouter(): Router {
+function appRouter(): Router {
   const router = new Router();
 
   // FIXME: since we have two routers on the same mountpoint: "/"
@@ -55,3 +55,5 @@ export default function AppRouter(): Router {
 
   return router;
 }
+
+module.exports = appRouter;

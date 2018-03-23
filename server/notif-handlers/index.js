@@ -1,8 +1,8 @@
-export shipUpdate from "./ship-update";
+module.exports.shipUpdate = require("./ship-update");
 
-export userUpdate from "./user-update";
-export batch from "./batch";
+module.exports.userUpdate = require("./user-update");
+module.exports.batch = require("./batch");
 
-export segmentUpdate from "./segment-update";
-export segmentDelete from "./segment-delete";
+module.exports.segmentUpdate = require("./segment-update");
+module.exports.segmentDelete = require("./segment-delete");
 

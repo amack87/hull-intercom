@@ -1,8 +1,8 @@
 // @flow
-import _ from "lodash";
-import Promise from "bluebird";
+const _ = require("lodash");
+const Promise = require("bluebird");
 
-export default function postLeads(ctx: Object, leads: Array<Object>): Promise {
+function postLeads(ctx: Object, leads: Array<Object>): Promise {
   const { client, service } = ctx;
   if (_.isEmpty(leads)) {
     client.logger.debug("postLeads.emptyList");
@@ -21,3 +21,5 @@ export default function postLeads(ctx: Object, leads: Array<Object>): Promise {
       });
   }, { concurrency: parseInt(process.env.LEADS_API_REQUEST_CONCURRENCY, 10) || 10 });
 }
+
+module.exports = postLeads;

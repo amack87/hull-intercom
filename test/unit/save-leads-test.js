@@ -1,10 +1,10 @@
 /* global describe, it */
-import { expect } from "chai";
-import sinon from "sinon";
+const { expect } = require("chai");
+const sinon = require("sinon");
 
-import saveLeads from "../server/jobs/save-leads";
-import getLeadIdent from "../server/lib/lead/get-lead-ident";
-import getClientMock from "./mocks/client-mock";
+const saveLeads = require("../../server/jobs/save-leads");
+const getLeadIdent = require("../../server/lib/lead/get-lead-ident");
+const getClientMock = require("./mocks/client-mock");
 
 describe("saveLeads", () => {
   it("should call asUser and traits methods for each lead and return Promise", () => {

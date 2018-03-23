@@ -1,10 +1,10 @@
-import _ from "lodash";
-import Promise from "bluebird";
+const _ = require("lodash");
+const Promise = require("bluebird");
 
-import sendUsers from "./send-users";
-import sendLeads from "./send-leads";
+const sendUsers = require("./send-users");
+const sendLeads = require("./send-leads");
 
-export default function handleBatch(ctx, messages) {
+function handleBatch(ctx, messages) {
   let users = _.filter(messages.map((message) => {
     const { segments, user } = message;
     return ctx.service.syncAgent.updateUserSegments(user, { add_segment_ids: segments.map(s => s.id) }, true);
@@ -29,3 +29,5 @@ export default function handleBatch(ctx, messages) {
       return Promise.resolve();
     });
 }
+
+module.exports = handleBatch;

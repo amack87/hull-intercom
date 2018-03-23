@@ -1,6 +1,6 @@
-import Promise from "bluebird";
+const Promise = require("bluebird");
 
-export default function segmentDelete(ctx) {
+function segmentDelete(ctx) {
   const { syncAgent } = ctx.service;
   if (!syncAgent.isConfigured()) {
     ctx.client.logger.error("connector.configuration.error", { errors: "connector is not configured" });
@@ -9,3 +9,5 @@ export default function segmentDelete(ctx) {
 
   return syncAgent.syncShip();
 }
+
+module.exports = segmentDelete;

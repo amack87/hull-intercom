@@ -1,8 +1,8 @@
 const Minihull = require("minihull");
 const expect = require("chai").expect;
 
-const Miniintercom = require("./miniintercom");
-const bootstrap = require("./bootstrap");
+const Miniintercom = require("./support/miniintercom");
+const bootstrap = require("./support/bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
@@ -13,7 +13,7 @@ describe("outgoing users traffic", function test() {
     miniintercom = new Miniintercom();
     server = bootstrap();
     minihull.listen(8001);
-    minihull.stubSegments([{ id: "s2", name: "Segment 2" }]);
+    minihull.stubUsersSegments([{ id: "s2", name: "Segment 2" }]);
     minihull.stubConnector({
       id: "595103c73628d081190000f6",
       private_settings: {
@@ -38,7 +38,7 @@ describe("outgoing users traffic", function test() {
       });
 
     minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "user_report:update", {
-      user: { id: "123", email: "foo@bar.com" },
+      user: { id: "123", email: "foo@bar.com", "traits_intercom/tags": ["Segment 2"] },
       segments: [{ id: "s1", name: "Segment 1" }],
       changes: {
         segments: {

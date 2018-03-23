@@ -1,6 +1,6 @@
-import _ from "lodash";
+const _ = require("lodash");
 
-export default function fields(req, res) {
+function fields(req, res) {
   const fieldsMap = _.filter(req.hull.service.syncAgent.userMapping.map, f => !f.read_only)
     .map(f => f.name);
   const customAttributes = req.hull.ship.private_settings.custom_attributes;
@@ -11,3 +11,5 @@ export default function fields(req, res) {
     })
   });
 }
+
+module.exports = fields;

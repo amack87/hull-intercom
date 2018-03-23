@@ -22,7 +22,7 @@ function getThrottle(ship) {
   return throttle;
 }
 
-export default class IntercomClient {
+class IntercomClient {
   constructor({ ship, client, metric }) {
     this.apiKey = _.get(ship, "private_settings.api_key");
     this.appId = _.get(ship, "private_settings.app_id");
@@ -36,7 +36,7 @@ export default class IntercomClient {
     return (!_.isEmpty(this.apiKey) && !_.isEmpty(this.appId)) || !_.isEmpty(this.accessToken);
   }
 
-  exec = (method, path, params = {}) => {
+  exec(method, path, params = {}) {
     const throttle = getThrottle(this.ship);
 
     if (!this.ifConfigured()) {
@@ -116,3 +116,5 @@ export default class IntercomClient {
     return filteredError;
   }
 }
+
+module.exports = IntercomClient;

@@ -1,6 +1,6 @@
-import Promise from "bluebird";
+const Promise = require("bluebird");
 
-export default function shipUpdate(ctx) {
+function shipUpdate(ctx) {
   const { syncAgent } = ctx.service;
   if (!syncAgent.isConfigured()) {
     ctx.client.logger.error("connector.configuration.error", { errors: "connector is not configured" });
@@ -9,3 +9,5 @@ export default function shipUpdate(ctx) {
 
   return syncAgent.syncShip({ forceTagsResync: true });
 }
+
+module.exports = shipUpdate;

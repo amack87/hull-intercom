@@ -1,7 +1,7 @@
-import Promise from "bluebird";
-import _ from "lodash";
+const Promise = require("bluebird");
+const _ = require("lodash");
 
-import handleRateLimitError from "../lib/handle-rate-limit-error";
+const handleRateLimitError = require("../lib/handle-rate-limit-error");
 
 /**
  * Saves users incoming from Intercom API
@@ -9,7 +9,7 @@ import handleRateLimitError from "../lib/handle-rate-limit-error";
  * @param ctx
  * @param payload
  */
-export default function saveUsers(ctx, payload) {
+function saveUsers(ctx, payload) {
   const { users } = payload;
   const { syncAgent } = ctx.service;
 
@@ -38,3 +38,5 @@ export default function saveUsers(ctx, payload) {
   })
     .catch(err => handleRateLimitError(ctx, "saveUsers", payload, err));
 }
+
+module.exports = saveUsers;

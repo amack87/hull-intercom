@@ -1,9 +1,9 @@
-import Promise from "bluebird";
-import _ from "lodash";
+const Promise = require("bluebird");
+const _ = require("lodash");
 
-import handleRateLimitError from "../lib/handle-rate-limit-error";
+const handleRateLimitError = require("../lib/handle-rate-limit-error");
 
-export default function handleBulk(ctx, payload) {
+function handleBulk(ctx, payload) {
   const { id, users, attempt = 1 } = payload;
   const { syncAgent, intercomAgent } = ctx.service;
   return intercomAgent.getJob(id)
@@ -39,3 +39,5 @@ export default function handleBulk(ctx, payload) {
     })
     .catch(err => handleRateLimitError(ctx, "handleBulk", payload, err));
 }
+
+module.exports = handleBulk;

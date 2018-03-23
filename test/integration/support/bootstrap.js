@@ -1,8 +1,8 @@
 const Connector = require("hull").Connector;
 const express = require("express");
 
-const server = require("../server/server").default;
-const worker = require("../server/worker").default;
+const server = require("../../../server/server");
+const worker = require("../../../server/worker");
 
 module.exports = function bootstrap() {
   const app = express();

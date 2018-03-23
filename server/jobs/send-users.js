@@ -1,13 +1,13 @@
-import Promise from "bluebird";
-import _ from "lodash";
+const Promise = require("bluebird");
+const _ = require("lodash");
 
-import handleRateLimitError from "../lib/handle-rate-limit-error";
+const handleRateLimitError = require("../lib/handle-rate-limit-error");
 
 /**
  * Takes list of users with fields and segment_ids set,
  * sends them to Intercom and tags them.
  */
-export default function sendUsers(ctx, payload) {
+function sendUsers(ctx, payload) {
   const { users, mode = "bulk" } = payload;
   const { syncAgent, intercomAgent } = ctx.service;
 
@@ -54,3 +54,5 @@ export default function sendUsers(ctx, payload) {
     })
     .catch(err => handleRateLimitError(ctx, "sendUsers", payload, err));
 }
+
+module.exports = sendUsers;

@@ -1,8 +1,8 @@
-import _ from "lodash";
-import uri from "urijs";
-import Promise from "bluebird";
+const _ = require("lodash");
+const uri = require("urijs");
+const Promise = require("bluebird");
 
-export default class WebhookAgent {
+class WebhookAgent {
   constructor(intercomAgent, client, ship, helpers, hostname, cache) {
     this.ship = ship;
     this.client = client;
@@ -100,3 +100,5 @@ export default class WebhookAgent {
     return uri(`https://${this.hostname}/intercom`).search(search).toString();
   }
 }
+
+module.exports = WebhookAgent;

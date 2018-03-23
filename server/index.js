@@ -1,11 +1,11 @@
 /* @flow */
-import Hull from "hull";
-import { Queue, Cache } from "hull/lib/infra";
-import KueAdapter from "hull/lib/infra/queue/adapter/kue";
-import express from "express";
+const Hull = require("hull");
+const { Queue, Cache } = require("hull/lib/infra");
+const KueAdapter = require("hull/lib/infra/queue/adapter/kue");
+const express = require("express");
 
-import server from "./server";
-import worker from "./worker";
+const server = require("./server");
+const worker = require("./worker");
 
 const {
   PORT = 8082,

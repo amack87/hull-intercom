@@ -1,8 +1,8 @@
-import Promise from "bluebird";
-import _ from "lodash";
-import moment from "moment";
+const Promise = require("bluebird");
+const _ = require("lodash");
+const moment = require("moment");
 
-export default function getLeadsScroll(ctx, scroll_param = null, updated_after, updated_before) {
+function getLeadsScroll(ctx, scroll_param = null, updated_after, updated_before) {
   const { client } = ctx;
   const { intercomClient } = ctx.service;
   return intercomClient.get("/contacts/scroll", { scroll_param })
@@ -43,3 +43,5 @@ export default function getLeadsScroll(ctx, scroll_param = null, updated_after, 
       return Promise.reject(fErr);
     });
 }
+
+module.exports = getLeadsScroll;

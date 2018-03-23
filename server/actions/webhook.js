@@ -1,9 +1,9 @@
-import { Batcher } from "hull/lib/infra";
-import _ from "lodash";
+const { Batcher } = require("hull/lib/infra");
+const _ = require("lodash");
 
-import { saveUsers, saveLeads, saveEvents } from "../jobs";
+const { saveUsers, saveLeads, saveEvents } = require("../jobs");
 
-export default function webhook(req, res, next) {
+function webhook(req, res, next) {
   req.hull.client.logger.debug("intercom message", _.pick(req.body, "id", "topic"));
   if (_.get(req, "body.topic") === "user.created") {
     // map the users to get only mapped fields
@@ -58,3 +58,5 @@ export default function webhook(req, res, next) {
     .addMessage(_.get(req, "body"))
     .then(next, next);
 }
+
+module.exports = webhook;

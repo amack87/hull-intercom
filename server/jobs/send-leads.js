@@ -1,12 +1,12 @@
-import _ from "lodash";
+const _ = require("lodash");
 
-import postLeads from "../lib/lead/post-leads";
+const postLeads = require("../lib/lead/post-leads");
 
 /**
  * Takes list of leads with fields and segment_ids set,
  * sends them to Intercom and tags them.
  */
-export default function sendLeads(ctx, payload) {
+function sendLeads(ctx, payload) {
   const { leads } = payload;
   const { syncAgent, intercomAgent } = ctx.service;
 
@@ -49,3 +49,5 @@ export default function sendLeads(ctx, payload) {
         .then(() => syncAgent.handleUserErrors(groupedErrors));
     });
 }
+
+module.exports = sendLeads;

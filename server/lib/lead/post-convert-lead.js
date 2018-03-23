@@ -1,7 +1,7 @@
 // @flow
-import Promise from "bluebird";
+const Promise = require("bluebird");
 
-export default function postConvertLead(ctx: Object, user: Object): Promise {
+function postConvertLead(ctx: Object, user: Object): Promise {
   const { client, service } = ctx;
 
   client.logger.debug("outgoing.user", user);
@@ -19,3 +19,5 @@ export default function postConvertLead(ctx: Object, user: Object): Promise {
       return Promise.resolve(fErr);
     });
 }
+
+module.exports = postConvertLead;

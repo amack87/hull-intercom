@@ -1,7 +1,7 @@
-import _ from "lodash";
-import Promise from "bluebird";
+const _ = require("lodash");
+const Promise = require("bluebird");
 
-export default class TagMapping {
+class TagMapping {
   constructor(intercomAgent, ship, helpers, logger) {
     this.ship = ship;
     this.intercomClient = intercomAgent.intercomClient;
@@ -142,3 +142,5 @@ export default class TagMapping {
       });
   }
 }
+
+module.exports = TagMapping;
