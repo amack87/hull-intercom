@@ -1,6 +1,7 @@
 const Promise = require("bluebird");
 const moment = require("moment");
 const _ = require("lodash");
+const { RateLimitError, ConfigurationError } = require("hull/lib/errors");
 
 const saveUsers = require("./save-users");
 const fetchAllUsers = require("./fetch-all-users");
@@ -66,6 +67,8 @@ function fetchUsers(ctx, payload = {}) {
           return Promise.resolve();
         });
     })
+    .catch(RateLimitError, () => Promise.resolve("ok"))
+    .catch(ConfigurationError, () => Promise.resolve("ok"))
     .catch((err) => {
       if (_.get(err, "statusCode") === 429 || _.get(err, "response.statusCode") === 429) {
         ctx.client.logger.debug("service.api.ratelimit", { message: "stopping fetch, another will continue" });
