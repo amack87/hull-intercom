@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.8.6
+
 ## 0.8.5
 - allow to set maximum notification batch size
 
