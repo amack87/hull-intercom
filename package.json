@@ -59,7 +59,7 @@
     "hull": "0.13.11",
     "lodash": "^4.17.5",
     "moment": "^2.19.2",
-    "newrelic": "^2.7.0",
+    "newrelic": "^3.2.0",
     "passport-intercom": "hull/passport-intercom#c7e038a2d1cba27858d33535bb319129b90eb723",
     "promise-streams": "^1.0.1",
     "redis": "^2.8.0",
