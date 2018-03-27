@@ -1,3 +1,4 @@
+global.Promise = require("bluebird");
 const Connector = require("hull").Connector;
 const express = require("express");
 

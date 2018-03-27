@@ -1,4 +1,5 @@
 /* @flow */
+global.Promise = require("bluebird");
 const Hull = require("hull");
 const { Queue, Cache } = require("hull/lib/infra");
 const KueAdapter = require("hull/lib/infra/queue/adapter/kue");
