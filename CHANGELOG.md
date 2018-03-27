@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.7
+- make bluebird promise global
+- fix error handling on status endpoint
+
 ## 0.8.6
 - upgrade hull-node@0.13.11
 - upgrade nodejs to 8.10

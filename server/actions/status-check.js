@@ -78,10 +78,15 @@ function statusCheck(req: Object, res: $Response) {
       }));
   }
 
-  Promise.all(promises).then(() => {
-    res.json({ status, messages, audit: _.sortBy(audit, ["name"]) });
-    return client.put(`${ship.id}/status`, { status, messages });
-  });
+  Promise.all(promises)
+    .catch((err) => {
+      status = "error";
+      messages.push(err.message);
+    })
+    .then(() => {
+      res.json({ status, messages, audit: _.sortBy(audit, ["name"]) });
+      return client.put(`${ship.id}/status`, { status, messages });
+    });
 }
 
 module.exports = statusCheck;
