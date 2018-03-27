@@ -13,9 +13,14 @@ describe("ensure webhook operation", function test() {
   beforeEach(() => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
-    minihull.listen(8001);
-    miniintercom.listen(8002);
-    server = bootstrap();
+    server = bootstrap(8000);
+    return Promise.all([
+      minihull.listen(8001),
+      miniintercom.listen(8002)
+    ]);
+  });
+
+  it("should retry after ten seconds in case of rate limit", (done) => {
     minihull.stubConnector({
       id: "595103c73628d081190000f6",
       private_settings: {
@@ -23,9 +28,6 @@ describe("ensure webhook operation", function test() {
         webhook_id: "abc-123"
       }
     });
-  });
-
-  it("should retry after ten seconds in case of rate limit", (done) => {
     miniintercom.stubApp("/users")
       .respond({
         users: [{
@@ -47,12 +49,15 @@ describe("ensure webhook operation", function test() {
     });
 
     minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "ship:update", { foo: "bar" })
-      .then((res) => {})
+      .then(() => {});
   });
 
-  afterEach(() => {
-    minihull.close();
-    miniintercom.close();
-    server.close();
+  afterEach((done) => {
+    server.close(() => {
+      Promise.all([
+        minihull.close(),
+        miniintercom.close()
+      ]).then(() => done());
+    });
   });
 });

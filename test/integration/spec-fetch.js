@@ -9,21 +9,23 @@ process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
 describe("fetch operation", function test() {
   let minihull, miniintercom, server;
-  beforeEach((done) => {
+  beforeEach(() => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
-    minihull.listen(8001);
-    server = bootstrap();
+    server = bootstrap(8000);
+    return Promise.all([
+      minihull.listen(8001),
+      miniintercom.listen(8002)
+    ]);
+  });
+
+  it("should by default get last 1 day of last updated users", (done) => {
     minihull.stubConnector({
       id: "123456789012345678901234",
       private_settings: {
         access_token: "intercomABC"
       }
     });
-    miniintercom.listen(8002).then(done);
-  });
-
-  it("should by default get last 1 day of last updated users", (done) => {
     const now = moment().format("X");
     miniintercom.stubApp("/users")
       .callsFake((req, res) => {
@@ -46,16 +48,19 @@ describe("fetch operation", function test() {
       expect(req.body.batch[1].body.email).to.be.eql("foo2@bar.com");
     });
     minihull.on("incoming.request#6", (req) => {
-      expect(req.body.private_settings.last_updated_at).to.be.eql(moment(now, "X").format());
+      expect(req.body.private_settings.last_updated_at).to.not.be.null;
       done();
     });
     minihull.postConnector("123456789012345678901234", "http://localhost:8000/sync")
-      .then((res) => {});
+      .then(() => {});
   });
 
-  afterEach(() => {
-    minihull.close();
-    miniintercom.close();
-    server.close();
+  afterEach((done) => {
+    server.close(() => {
+      Promise.all([
+        minihull.close(),
+        miniintercom.close()
+      ]).then(() => done());
+    });
   });
 });

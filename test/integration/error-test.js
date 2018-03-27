@@ -6,19 +6,19 @@ const bootstrap = require("./support/bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
-describe("outgoing users traffic", function test() {
+describe("intercom error responses", function test() {
   let minihull, miniintercom, server;
   beforeEach(() => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
-    server = bootstrap();
+    server = bootstrap(8000);
     return Promise.all([
       minihull.listen(8001),
       miniintercom.listen(8002)
     ]);
   });
 
-  it("should remove tags from users", (done) => {
+  it("should handle Unauthorized response", (done) => {
     minihull.stubUsersSegments([{ id: "s2", name: "Segment 2" }]);
     minihull.stubConnector({
       id: "595103c73628d081190000f6",
@@ -27,34 +27,27 @@ describe("outgoing users traffic", function test() {
         synchronized_segments: ["s1"]
       }
     });
-    const getTagsStub = miniintercom.stubApp("GET", "/tags")
-      .respond({ tags: [] });
-    miniintercom.stubApp("POST", "/users")
-      .callsFake((req, res) => {
-        res.json({ email: "foo@bar.com", tags: { tags: [{ name: "Segment 2" }] } });
-      });
-    const tagsStub = miniintercom.stubApp("POST", "/tags")
-      .callsFake((req, res) => {
-        res.end("ok");
+    const getTagsStub = miniintercom.stubApp("POST", "/subscriptions")
+      .respond((req, res) => {
+        res.status(401).json({
+          code: "token_not_found",
+          message: "Token not found"
+        });
       });
 
     minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "user_report:update", {
       user: { id: "123", email: "foo@bar.com", "traits_intercom/tags": ["Segment 2"] },
       segments: [{ id: "s1", name: "Segment 1" }],
-      changes: {
-        segments: {
-          left: [{ id: "s2", name: "Segment 2" }]
-        }
-      },
+      changes: {},
       events: []
     });
 
-    miniintercom.on("incoming.request@/tags", (req) => {
-      if (req.body.users) {
-        expect(req.body.users[0]).to.eql({ email: "foo@bar.com", untag: true });
-        expect(req.body.name).to.equal("Segment 2");
-        done();
-      }
+    setTimeout(() => {
+      done();
+    }, 500);
+
+    minihull.on("incoming.request#4", () => {
+      expect(true).to.be.false;
     });
   });
 

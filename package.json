@@ -80,7 +80,7 @@
     "eslint-plugin-flowtype": "^2.39.1",
     "eslint-plugin-flowtype-errors": "^3.3.6",
     "eslint-plugin-import": "^2.8.0",
-    "flow-bin": "^0.59.0",
+    "flow-bin": "^0.68.0",
     "flow-typed": "^2.2.3",
     "mini-application": "^1.0.6",
     "minihull": "^2.1.2",
