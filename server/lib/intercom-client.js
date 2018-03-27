@@ -1,26 +1,14 @@
-import superagent from "superagent";
-import Throttle from "superagent-throttle";
-import prefixPlugin from "superagent-prefix";
-import _ from "lodash";
+const Promise = require("bluebird");
+const superagent = require("superagent");
+const Throttle = require("superagent-throttle");
+const prefixPlugin = require("superagent-prefix");
+const _ = require("lodash");
 
 const { superagentUrlTemplatePlugin, superagentInstrumentationPlugin } = require("hull/lib/utils");
+const superagentErrorPlugin = require("hull/lib/utils/superagent-error-plugin");
+const { ConfigurationError, RateLimitError } = require("hull/lib/errors");
 
-const THROTTLES = {};
-
-function getThrottle(ship) {
-  const key = ship.id;
-  if (THROTTLES[key]) return THROTTLES[key];
-  const throttle = new Throttle({
-    active: true,
-    rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
-    ratePer: parseInt(process.env.THROTTLE_PER_RATE || 10500, 10),
-    concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
-  });
-  THROTTLES[key] = throttle;
-  return throttle;
-}
-
-export default class IntercomClient {
+class IntercomClient {
   constructor({ ship, client, metric }) {
     this.apiKey = _.get(ship, "private_settings.api_key");
     this.appId = _.get(ship, "private_settings.app_id");
@@ -28,84 +16,104 @@ export default class IntercomClient {
     this.client = client;
     this.metric = metric;
     this.ship = ship;
+
+    const throttle = new Throttle({
+      active: true,
+      rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
+      ratePer: parseInt(process.env.THROTTLE_PER_RATE || 10500, 10),
+      concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
+    });
+
+    this.agent = superagent.agent()
+      .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
+      .use((request) => {
+        // force superagent to return bluebird Promise all the time
+        const originalThen = request.then;
+        request.then = function then(resolve, reject) {
+          return Promise.resolve(originalThen.call(request, resolve, reject));
+        };
+      })
+      .accept("application/json")
+      .use(superagentErrorPlugin({ timeout: 60000 }))
+      .ok((res) => {
+        if (res.status === 401) {
+          throw new ConfigurationError(res.text);
+        }
+        if (res.status === 429) {
+          throw new RateLimitError(res.text);
+        }
+        return res.status < 400;
+      })
+      .on("response", (res) => {
+        const limit = _.get(res.header, "x-ratelimit-limit");
+        const remaining = _.get(res.header, "x-ratelimit-remaining");
+        const reset = _.get(res.header, "x-ratelimit-reset");
+        if (remaining !== undefined) {
+          this.client.logger.debug("intercomClient.ratelimit", {
+            remaining, limit, reset
+          });
+          this.metric.value("ship.service_api.remaining", remaining);
+        }
+
+        if (limit !== undefined) {
+          this.metric.value("ship.service_api.limit", limit);
+        }
+      })
+      .use(throttle.plugin(this.ship))
+      .use(superagentUrlTemplatePlugin())
+      .use(superagentInstrumentationPlugin({ logger: this.client.logger, metric: this.metric }))
+      .use((request) => {
+        // error filtering
+        const end = request.end;
+        request.end = (cb) => {
+          end.call(request, (err, res) => {
+            if (err) {
+              err.req = {
+                url: _.get(err, "response.request.url"),
+                method: _.get(err, "response.request.method"),
+                data: _.get(err, "response.request._data")
+              };
+              err.body = _.get(err, "response.body");
+              err.statusCode = _.get(err, "response.statusCode");
+              delete err.response;
+            }
+
+            cb(err, res);
+          });
+        };
+      });
+
+    if (this.accessToken) {
+      this.agent = this.agent.auth(this.accessToken);
+    } else {
+      this.agent = this.agent.auth(this.appId, this.apiKey);
+    }
   }
 
   ifConfigured() {
     return (!_.isEmpty(this.apiKey) && !_.isEmpty(this.appId)) || !_.isEmpty(this.accessToken);
   }
 
-  exec = (method, path, params = {}) => {
-    const throttle = getThrottle(this.ship);
-
-    if (!this.ifConfigured()) {
-      throw new Error("Client access data not set!");
-    }
-
-    const req = superagent[method](path);
-    req.use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"));
-    req.accept("application/json");
-    req.timeout(60000);
-    req.retry(2);
-    req.on("error", (error) => {
-      this.client.logger.error("intercomClient.resError", { status: error.status, path, method });
-    });
-    req.on("response", (res) => {
-      const limit = _.get(res.header, "x-ratelimit-limit");
-      const remaining = _.get(res.header, "x-ratelimit-remaining");
-      const reset = _.get(res.header, "x-ratelimit-reset");
-      if (remaining !== undefined) {
-        this.client.logger.debug("intercomClient.ratelimit", {
-          remaining, limit, reset
-        });
-        this.metric.value("ship.service_api.remaining", remaining);
-      }
-
-      if (limit !== undefined) {
-        this.metric.value("ship.service_api.limit", limit);
-      }
-    });
-
-    if (this.accessToken) {
-      req.auth(this.accessToken);
-    } else {
-      req.auth(this.appId, this.apiKey);
-    }
-
-    if (method === "get" && params) {
-      req.query(params);
-    } else if (params) {
-      req.send(params);
-    }
-
-    req.use(throttle.plugin());
-    req.use(superagentUrlTemplatePlugin());
-    req.use(superagentInstrumentationPlugin({ logger: this.client.logger, metric: this.metric }));
-
-    return req;
-  }
-
   get(url, query) {
-    return this.exec("get", url, query);
+    if (!this.ifConfigured()) {
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
+    }
+    return this.agent.get(url).query(query);
   }
 
   post(url, params) {
-    return this.exec("post", url, params);
+    if (!this.ifConfigured()) {
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
+    }
+    return this.agent.post(url).send(params);
   }
 
   delete(url, params) {
-    return this.exec("delete", url, params);
-  }
-
-  handleError(err) { // eslint-disable-line class-methods-use-this
-    const filteredError = new Error(err.message);
-    filteredError.stack = err.stack;
-    filteredError.req = {
-      url: _.get(err, "response.request.url"),
-      method: _.get(err, "response.request.method"),
-      data: _.get(err, "response.request._data")
-    };
-    filteredError.body = _.get(err, "response.body");
-    filteredError.statusCode = _.get(err, "response.statusCode");
-    return filteredError;
+    if (!this.ifConfigured()) {
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
+    }
+    return this.agent.delete(url).query(params);
   }
 }
+
+module.exports = IntercomClient;

@@ -1,9 +1,9 @@
 /* @flow */
-import { Strategy as IntercomStrategy } from "passport-intercom";
-import moment from "moment";
-import { oAuthHandler } from "hull/lib/utils";
+const { Strategy: IntercomStrategy } = require("passport-intercom");
+const moment = require("moment");
+const { oAuthHandler } = require("hull/lib/utils");
 
-export default function OAuthRouter(dependencies: Object) {
+function oAuthRouter(dependencies: Object) {
   const {
     hostSecret,
     clientID,
@@ -61,3 +61,5 @@ export default function OAuthRouter(dependencies: Object) {
     },
   });
 }
+
+module.exports = oAuthRouter;

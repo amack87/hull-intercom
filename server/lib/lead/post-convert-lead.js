@@ -1,7 +1,7 @@
 // @flow
-import Promise from "bluebird";
+const Promise = require("bluebird");
 
-export default function postConvertLead(ctx: Object, user: Object): Promise {
+function postConvertLead(ctx: Object, user: Object): Promise {
   const { client, service } = ctx;
 
   client.logger.debug("outgoing.user", user);
@@ -14,8 +14,9 @@ export default function postConvertLead(ctx: Object, user: Object): Promise {
       return response.body;
     })
     .catch((err) => {
-      const fErr = service.intercomClient.handleError(err);
-      client.logger.error("postConvertLead.error", fErr);
-      return Promise.resolve(fErr);
+      client.logger.error("postConvertLead.error", err);
+      return Promise.resolve(err);
     });
 }
+
+module.exports = postConvertLead;

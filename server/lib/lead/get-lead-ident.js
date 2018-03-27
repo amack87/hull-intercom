@@ -1,5 +1,5 @@
 // @flow
-export default function getLeadsIdent(ctx: Object, lead: Object): Object {
+function getLeadsIdent(ctx: Object, lead: Object): Object {
   const ident = {};
 
   ident.anonymous_id = `intercom:${lead.user_id}`;
@@ -8,3 +8,5 @@ export default function getLeadsIdent(ctx: Object, lead: Object): Object {
   }
   return ident;
 }
+
+module.exports = getLeadsIdent;

@@ -1,9 +1,9 @@
 // @flow
-import Promise from "bluebird";
+const Promise = require("bluebird");
 
-import postConvertLead from "../lib/lead/post-convert-lead";
+const postConvertLead = require("../lib/lead/post-convert-lead");
 
-export default function convertLeadsToUsers(ctx: Object, payload: Object): Promise {
+function convertLeadsToUsers(ctx: Object, payload: Object): Promise {
   const { users } = payload;
 
   return Promise.map(users, (user) => {
@@ -24,3 +24,5 @@ export default function convertLeadsToUsers(ctx: Object, payload: Object): Promi
       });
   });
 }
+
+module.exports = convertLeadsToUsers;

@@ -1,7 +1,7 @@
-import Promise from "bluebird";
-import _ from "lodash";
+const Promise = require("bluebird");
+const _ = require("lodash");
 
-export default function userUpdate(ctx, messages) {
+function userUpdate(ctx, messages) {
   const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
   if (!syncAgent.isConfigured()) {
@@ -78,3 +78,5 @@ export default function userUpdate(ctx, messages) {
 
   return Promise.all(promises);
 }
+
+module.exports = userUpdate;

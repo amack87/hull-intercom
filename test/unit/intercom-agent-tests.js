@@ -1,9 +1,9 @@
 /* global describe, it */
-import { expect } from "chai";
-import sinon from "sinon";
-import { Cache } from "hull/lib/infra";
+const { expect } = require("chai");
+const sinon = require("sinon");
+const { Cache } = require("hull/lib/infra");
 
-import IntercomAgent from "../server/lib/intercom-agent";
+const IntercomAgent = require("../../server/lib/intercom-agent");
 
 
 describe("IntercomAgent", () => {

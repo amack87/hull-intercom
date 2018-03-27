@@ -1,11 +1,11 @@
 /* @flow */
-import express from "express";
-import queueUiRouter from "hull/lib/infra/queue/ui-router";
+const express = require("express");
+const queueUiRouter = require("hull/lib/infra/queue/ui-router");
 
-import appRouter from "./router/app";
-import oAuthRouter from "./router/oauth";
+const appRouter = require("./router/app");
+const oAuthRouter = require("./router/oauth");
 
-export default function server(app: express, dependencies: Object = {}): express {
+function server(app: express, dependencies: Object = {}): express {
   const { hostSecret, queue } = dependencies;
 
   app.use("/", appRouter());
@@ -17,3 +17,5 @@ export default function server(app: express, dependencies: Object = {}): express
   }
   return app;
 }
+
+module.exports = server;

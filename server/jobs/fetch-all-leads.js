@@ -1,10 +1,10 @@
-import Promise from "bluebird";
-import _ from "lodash";
+const Promise = require("bluebird");
+const _ = require("lodash");
 
-import saveLeads from "./save-leads";
-import getLeadsScroll from "../lib/lead/get-leads-scroll";
+const saveLeads = require("./save-leads");
+const getLeadsScroll = require("../lib/lead/get-leads-scroll");
 
-export default function fetchAllLeads(ctx, payload = {}) {
+function fetchAllLeads(ctx, payload = {}) {
   const { scroll_param, updated_after, updated_before } = payload;
   if (_.isEmpty(scroll_param)) {
     ctx.metric.event({
@@ -23,3 +23,5 @@ export default function fetchAllLeads(ctx, payload = {}) {
       ]);
     });
 }
+
+module.exports = fetchAllLeads;

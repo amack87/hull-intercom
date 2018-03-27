@@ -1,16 +1,16 @@
-export sendUsers from "./send-users";
-export sendLeads from "./send-leads";
+module.exports.sendUsers = require("./send-users");
+module.exports.sendLeads = require("./send-leads");
 
-export saveUsers from "./save-users";
-export saveEvents from "./save-events";
-export saveLeads from "./save-leads";
+module.exports.saveUsers = require("./save-users");
+module.exports.saveEvents = require("./save-events");
+module.exports.saveLeads = require("./save-leads");
 
-export fetchAllUsers from "./fetch-all-users";
-export fetchAllLeads from "./fetch-all-leads";
-export fetchUsers from "./fetch-users";
-export fetchLeads from "./fetch-leads";
+module.exports.fetchAllUsers = require("./fetch-all-users");
+module.exports.fetchAllLeads = require("./fetch-all-leads");
+module.exports.fetchUsers = require("./fetch-users");
+module.exports.fetchLeads = require("./fetch-leads");
 
-export handleBatch from "./handle-batch";
-export handleBulk from "./handle-bulk";
+module.exports.handleBatch = require("./handle-batch");
+module.exports.handleBulk = require("./handle-bulk");
 
-export convertLeadsToUsers from "./convert-leads-to-users";
+module.exports.convertLeadsToUsers = require("./convert-leads-to-users");

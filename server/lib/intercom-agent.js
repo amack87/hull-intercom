@@ -1,11 +1,11 @@
-import _ from "lodash";
-import Promise from "bluebird";
-import moment from "moment";
+const _ = require("lodash");
+const Promise = require("bluebird");
+const moment = require("moment");
 
 /**
  * Superset of Intercom API
  */
-export default class IntercomAgent {
+class IntercomAgent {
   constructor(intercomClient, { client, metric, cache }) {
     this.intercomClient = intercomClient;
     this.client = client;
@@ -70,20 +70,16 @@ export default class IntercomAgent {
         return { users, scroll_param: next_scroll_param };
       })
       .catch((err) => {
-        const fErr = this.intercomClient.handleError(err);
-
-        if (_.get(fErr, "body.errors[0].code") === "scroll_exists") {
+        if (_.get(err, "body.errors[0].code") === "scroll_exists") {
           this.metric.event({ title: "Trying to perform two separate scrolls" });
           return Promise.resolve([]);
         }
-
-        if (_.get(fErr, "body.errors[0].code") === "not_found") {
+        if (_.get(err, "body.errors[0].code") === "not_found") {
           this.metric.event({ title: "Scroll expired, should start it again" });
           return Promise.resolve([]);
         }
-
         // handle errors which may happen here
-        return Promise.reject(fErr);
+        return Promise.reject(err);
       });
   }
 
@@ -114,9 +110,8 @@ export default class IntercomAgent {
             return response.body;
           })
           .catch((err) => {
-            const fErr = this.intercomClient.handleError(err);
-            this.logger.error("intercomAgent.sendUsers.microbatch.error", fErr);
-            return Promise.reject(fErr);
+            this.logger.error("intercomAgent.sendUsers.microbatch.error", err);
+            return Promise.reject(err);
           });
       }, { concurrency: parseInt(process.env.USERS_API_REQUEST_CONCURRENCY, 10) || 10 });
     }
@@ -124,9 +119,8 @@ export default class IntercomAgent {
     return this.intercomClient
       .post("/bulk/users", body)
       .catch((err) => {
-        const fErr = this.intercomClient.handleError(err);
-        this.logger.error("intercomAgent.sendUsers.bulkSubmit.error", fErr);
-        return Promise.reject(fErr);
+        this.logger.error("intercomAgent.sendUsers.bulkSubmit.error", err);
+        return Promise.reject(err);
       });
   }
 
@@ -142,9 +136,8 @@ export default class IntercomAgent {
     return Promise.map(opArray, (op) => {
       return this.intercomClient.post("/tags", op)
         .catch((err) => {
-          const fErr = this.intercomClient.handleError(err);
-          this.logger.error("intercomAgent.tagUsers.error", fErr);
-          return Promise.reject(fErr);
+          this.logger.error("intercomAgent.tagUsers.error", err);
+          return Promise.reject(err);
         });
     }, { concurrency: parseInt(process.env.TAG_API_REQUEST_CONCURRENCY, 10) || 1 });
   }
@@ -158,9 +151,8 @@ export default class IntercomAgent {
         return _.get(response, "body.total_count");
       })
       .catch((err) => {
-        const fErr = this.intercomClient.handleError(err);
-        this.logger.error("getUsersTotalCount.error", fErr);
-        return Promise.reject(fErr);
+        this.logger.error("getUsersTotalCount.error", err);
+        return Promise.reject(err);
       });
   }
 
@@ -189,9 +181,8 @@ export default class IntercomAgent {
         };
       })
       .catch((err) => {
-        const fErr = this.intercomClient.handleError(err);
-        this.logger.error("getRecentUsers.error", fErr);
-        return Promise.reject(fErr);
+        this.logger.error("getRecentUsers.error", err);
+        return Promise.reject(err);
       });
   }
 
@@ -209,10 +200,7 @@ export default class IntercomAgent {
     if (true || events.length <= 10) { // eslint-disable-line no-constant-condition
       return Promise.map(events, (event) => {
         return this.intercomClient
-          .post("/events", event)
-          .catch((err) => {
-            return Promise.reject(this.intercomClient.handleError(err));
-          });
+          .post("/events", event);
       }, { concurrency: 1 });
     }
 
@@ -236,9 +224,6 @@ export default class IntercomAgent {
               // FIXME: place to verify if the error still persists
               console.error(res.body.items[0].error);
             });
-        })
-        .catch((err) => {
-          return Promise.reject(this.intercomClient.handleError(err));
         });
     }, { concurrency: 1 });
   }
@@ -256,3 +241,5 @@ export default class IntercomAgent {
     });
   }
 }
+
+module.exports = IntercomAgent;

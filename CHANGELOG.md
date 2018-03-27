@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.6
+- upgrade hull-node@0.13.11
+- upgrade nodejs to 8.10
+- remove import/export syntax and cleanup babeljs configuration
+- introduce better error handling
+
 ## 0.8.5
 - allow to set maximum notification batch size
 

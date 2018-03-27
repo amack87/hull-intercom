@@ -1,9 +1,9 @@
 /* global describe, it */
-import { expect } from "chai";
-import sinon from "sinon";
-import moment from "moment";
+const { expect } = require("chai");
+const sinon = require("sinon");
+const moment = require("moment");
 
-import handleRateLimitError from "../server/lib/handle-rate-limit-error";
+const handleRateLimitError = require("../../server/lib/handle-rate-limit-error");
 
 describe("handleRateLimitError", () => {
   const ctxStub = {

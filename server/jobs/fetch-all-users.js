@@ -1,9 +1,9 @@
-import Promise from "bluebird";
-import _ from "lodash";
+const Promise = require("bluebird");
+const _ = require("lodash");
 
-import saveUsers from "./save-users";
+const saveUsers = require("./save-users");
 
-export default function fetchAllUsers(ctx, payload = {}) {
+function fetchAllUsers(ctx, payload = {}) {
   const { scroll_param, updated_after, updated_before } = payload;
   const { intercomAgent } = ctx.service;
   if (_.isEmpty(scroll_param)) {
@@ -22,3 +22,5 @@ export default function fetchAllUsers(ctx, payload = {}) {
       ]);
     });
 }
+
+module.exports = fetchAllUsers;

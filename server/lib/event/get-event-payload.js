@@ -1,5 +1,5 @@
 // @flow
-import _ from "lodash";
+const _ = require("lodash");
 
 const mapping = [
   {
@@ -216,7 +216,7 @@ const mapping = [
   }
 ];
 
-export default function getEventPayload(ctx: Object, intercomEvent: Object): Object {
+function getEventPayload(ctx: Object, intercomEvent: Object): Object {
   const mappedEvent = _.find(mapping, { intercom: intercomEvent.topic });
   if (!mappedEvent) {
     return {};
@@ -241,3 +241,5 @@ export default function getEventPayload(ctx: Object, intercomEvent: Object): Obj
     user, eventName, props, context
   };
 }
+
+module.exports = getEventPayload;

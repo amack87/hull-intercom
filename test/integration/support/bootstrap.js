@@ -1,12 +1,12 @@
 const Connector = require("hull").Connector;
 const express = require("express");
 
-const server = require("../server/server").default;
-const worker = require("../server/worker").default;
+const server = require("../../../server/server");
+const worker = require("../../../server/worker");
 
-module.exports = function bootstrap() {
+module.exports = function bootstrap(port = 8000) {
   const app = express();
-  const connector = new Connector({ hostSecret: "1234", port: 8000, clientConfig: { protocol: "http", firehoseUrl: "firehose" } });
+  const connector = new Connector({ hostSecret: "1234", port, clientConfig: { protocol: "http", firehoseUrl: "firehose" } });
   connector.setupApp(app);
   server(app, {
     hostSecret: "1234",

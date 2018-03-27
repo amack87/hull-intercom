@@ -1,7 +1,7 @@
 // @flow
-import _ from "lodash";
+const _ = require("lodash");
 
-export default function getTagEventTraits(ctx: Object, user: Object, allTags: Array<Object>): Object {
+function getTagEventTraits(ctx: Object, user: Object, allTags: Array<Object>): Object {
   const tags = user.tags.tags.map((t) => {
     if (!t.name) {
       t = _.find(allTags, { id: t.id });
@@ -16,3 +16,5 @@ export default function getTagEventTraits(ctx: Object, user: Object, allTags: Ar
   traits["intercom/tags"] = _.compact(tags);
   return traits;
 }
+
+module.exports = getTagEventTraits;

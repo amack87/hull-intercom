@@ -1,7 +1,7 @@
-import _ from "lodash";
-import Promise from "bluebird";
+const _ = require("lodash");
+const Promise = require("bluebird");
 
-export default class TagMapping {
+class TagMapping {
   constructor(intercomAgent, ship, helpers, logger) {
     this.ship = ship;
     this.intercomClient = intercomAgent.intercomClient;
@@ -121,14 +121,12 @@ export default class TagMapping {
         return Promise.resolve();
       })
       .catch((err) => {
-        const fErr = this.intercomClient.handleError(err);
-
-        if (fErr.statusCode === 404) {
+        if (err.statusCode === 404) {
           _.unset(this.mapping, segment.id);
           return Promise.resolve();
         }
 
-        if (fErr.statusCode === 400) {
+        if (err.statusCode === 400) {
           this.logger.error("sync.error", {
             error: "Unable to delete tag",
             segment: segment.id,
@@ -138,7 +136,9 @@ export default class TagMapping {
           return Promise.resolve();
         }
 
-        return Promise.reject(fErr);
+        return Promise.reject(err);
       });
   }
 }
+
+module.exports = TagMapping;

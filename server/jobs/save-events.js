@@ -1,12 +1,12 @@
-import Promise from "bluebird";
+const Promise = require("bluebird");
 
-import getLeadIdent from "../lib/lead/get-lead-ident";
-import isTagEvent from "../lib/event/is-tag-event";
-import getEventPayload from "../lib/event/get-event-payload";
+const getLeadIdent = require("../lib/lead/get-lead-ident");
+const isTagEvent = require("../lib/event/is-tag-event");
+const getEventPayload = require("../lib/event/get-event-payload");
 
-import handleRateLimitError from "../lib/handle-rate-limit-error";
+const handleRateLimitError = require("../lib/handle-rate-limit-error");
 
-export default function saveEvents(ctx, payload) {
+function saveEvents(ctx, payload) {
   const { client, metric } = ctx;
   const { syncAgent } = ctx.service;
   const { events = [] } = payload;
@@ -49,3 +49,5 @@ export default function saveEvents(ctx, payload) {
   })
     .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
 }
+
+module.exports = saveEvents;

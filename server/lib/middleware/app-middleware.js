@@ -1,12 +1,13 @@
 /* @flow */
-import { Request, Response, Next } from "express";
-import Redlock from "redlock";
-import redis from "redis";
-import Promise from "bluebird";
+import type { Request, Response, Next } from "express";
 
-import IntercomClient from "../intercom-client";
-import SyncAgent from "../sync-agent";
-import IntercomAgent from "../intercom-agent";
+const Redlock = require("redlock");
+const redis = require("redis");
+const Promise = require("bluebird");
+
+const IntercomClient = require("../intercom-client");
+const SyncAgent = require("../sync-agent");
+const IntercomAgent = require("../intercom-agent");
 
 let redlock;
 if (false && process.env.REDIS_URL) {
@@ -14,7 +15,7 @@ if (false && process.env.REDIS_URL) {
   redlock = new Redlock([client]);
 }
 
-export default function AppMiddleware() {
+function appMiddleware() {
   return function middleware(req: Request, res: Response, next: Next) {
     req.hull.service = req.hull.service || {};
     const ctx = req.hull;
@@ -53,3 +54,5 @@ export default function AppMiddleware() {
     return next();
   };
 }
+
+module.exports = appMiddleware;

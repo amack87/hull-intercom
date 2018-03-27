@@ -1,11 +1,11 @@
 /* global describe, it */
-import Hull from "hull";
-import express from "express";
-import request from "request";
+const Hull = require("hull");
+const express = require("express");
+const request = require("request");
 
-import AppRouter from "../server/router/app";
-import OAuthRouter from "../server/router/oauth";
-import ClientMock from "./mocks/client-mock";
+const AppRouter = require("../../server/router/app");
+const OAuthRouter = require("../../server/router/oauth");
+const ClientMock = require("./mocks/client-mock");
 
 const assert = require("assert");
 

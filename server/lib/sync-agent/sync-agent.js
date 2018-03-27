@@ -1,12 +1,12 @@
-import _ from "lodash";
-import moment from "moment";
-import Promise from "bluebird";
+const _ = require("lodash");
+const moment = require("moment");
+const Promise = require("bluebird");
 
-import TagMapping from "./tag-mapping";
-import UserMapping from "./user-mapping";
-import WebhookAgent from "./webhook-agent";
+const TagMapping = require("./tag-mapping");
+const UserMapping = require("./user-mapping");
+const WebhookAgent = require("./webhook-agent");
 
-export default class SyncAgent {
+class SyncAgent {
   constructor(intercomAgent, client, segments, metric, ship, helpers, hostname, cache) {
     this.ship = ship;
     this.segments = segments;
@@ -106,49 +106,47 @@ export default class SyncAgent {
   }
 
   groupUsersToTag(users) {
-    return Promise.resolve(this.segments)
-      .then((segments) => {
-        return _.reduce(users, (o, user) => {
-          const existingUserTags = _.intersection(user["traits_intercom/tags"], segments.map(s => s.name));
+    const segments = this.segments;
+    return _.reduce(users, (o, user) => {
+      const existingUserTags = _.intersection(user["traits_intercom/tags"], segments.map(s => s.name));
 
-          const userOp = {};
-          if (!_.isEmpty(user["traits_intercom/id"])) {
-            userOp.id = user["traits_intercom/id"];
-          } else if (!_.isEmpty(user.email)) {
-            userOp.email = user.email;
-          } else {
-            return o;
-          }
-          const segmentsToAdd = _.has(user, "add_segment_ids")
-            ? user.add_segment_ids
-            : user.segment_ids;
-          segmentsToAdd.map((segment_id) => {
-            const segment = _.find(segments, { id: segment_id });
-            if (_.isEmpty(segment)) {
-              this.client.logger.debug("outgoing.user.add_segment_not_found", segment);
-              return o;
-            }
-            if (_.includes(existingUserTags, segment.name)) {
-              this.client.logger.debug("outgoing.user.add_segment_skip", segment.name);
-              return null;
-            }
-            o[segment.name] = o[segment.name] || [];
-            return o[segment.name].push(userOp);
-          });
-          user.remove_segment_ids.map((segment_id) => {
-            const segment = _.find(segments, { id: segment_id });
-            if (_.isEmpty(segment)) {
-              this.client.logger.debug("outgoing.user.remove_segment_not_found", segment);
-              return o;
-            }
-            o[segment.name] = o[segment.name] || [];
-            return o[segment.name].push(_.merge({}, userOp, {
-              untag: true
-            }));
-          });
+      const userOp = {};
+      if (!_.isEmpty(user["traits_intercom/id"])) {
+        userOp.id = user["traits_intercom/id"];
+      } else if (!_.isEmpty(user.email)) {
+        userOp.email = user.email;
+      } else {
+        return o;
+      }
+      const segmentsToAdd = _.has(user, "add_segment_ids")
+        ? user.add_segment_ids
+        : user.segment_ids;
+      segmentsToAdd.map((segment_id) => {
+        const segment = _.find(segments, { id: segment_id });
+        if (_.isEmpty(segment)) {
+          this.client.logger.debug("outgoing.user.add_segment_not_found", segment);
           return o;
-        }, {});
+        }
+        if (_.includes(existingUserTags, segment.name)) {
+          this.client.logger.debug("outgoing.user.add_segment_skip", segment.name);
+          return null;
+        }
+        o[segment.name] = o[segment.name] || [];
+        return o[segment.name].push(userOp);
       });
+      user.remove_segment_ids.map((segment_id) => {
+        const segment = _.find(segments, { id: segment_id });
+        if (_.isEmpty(segment)) {
+          this.client.logger.debug("outgoing.user.remove_segment_not_found", segment);
+          return o;
+        }
+        o[segment.name] = o[segment.name] || [];
+        return o[segment.name].push(_.merge({}, userOp, {
+          untag: true
+        }));
+      });
+      return o;
+    }, {});
   }
 
   /**
@@ -213,3 +211,5 @@ export default class SyncAgent {
       });
   }
 }
+
+module.exports = SyncAgent;

@@ -5,8 +5,8 @@ const sinon = require("sinon");
 const winston = require("winston");
 require("winston-spy");
 
-const Miniintercom = require("./miniintercom");
-const bootstrap = require("./bootstrap");
+const Miniintercom = require("./support/miniintercom");
+const bootstrap = require("./support/bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 process.env.RATE_LIMIT_DELAY = 200;
@@ -18,9 +18,14 @@ describe("log error response from intercom", function test() {
   beforeEach(() => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
-    minihull.listen(8001);
-    miniintercom.listen(8002);
-    server = bootstrap();
+    server = bootstrap(8000);
+    return Promise.all([
+      minihull.listen(8001),
+      miniintercom.listen(8002)
+    ]);
+  });
+
+  it("should log the response status after the error", (done) => {
     minihull.stubConnector({
       id: "595103c73628d081190000f6",
       private_settings: {
@@ -28,9 +33,7 @@ describe("log error response from intercom", function test() {
         webhook_id: "abc-123"
       }
     });
-  });
 
-  it("should log the response status after the error", (done) => {
     const loggerSpy = sinon.spy();
     Hull.logger.transports.console.level = "debug";
     Hull.logger.add(winston.transports.SpyLogger, { level: "debug", spy: loggerSpy });
@@ -42,17 +45,20 @@ describe("log error response from intercom", function test() {
       .then(() => {});
 
     setTimeout(() => {
-      expect(loggerSpy.callCount).to.equal(6);
-      expect(loggerSpy.getCall(4).args[0]).to.equal("error");
-      expect(loggerSpy.getCall(4).args[1]).to.equal("intercomClient.resError");
+      expect(loggerSpy.callCount).to.equal(4);
+      expect(loggerSpy.getCall(3).args[0]).to.equal("error");
+      expect(loggerSpy.getCall(3).args[1]).to.equal("connector.notificationHandler.error");
       Hull.logger.remove(winston.transports.SpyLogger);
       done();
     }, 200);
   });
 
-  afterEach(() => {
-    minihull.close();
-    miniintercom.close();
-    server.close();
+  afterEach((done) => {
+    server.close(() => {
+      Promise.all([
+        minihull.close(),
+        miniintercom.close()
+      ]).then(() => done());
+    });
   });
 });
