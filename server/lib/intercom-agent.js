@@ -110,6 +110,9 @@ class IntercomAgent {
             return response.body;
           })
           .catch((err) => {
+            if (_.get(err, "body.errors[0].code") === "unique_user_constraint") {
+              return err;
+            }
             this.logger.error("intercomAgent.sendUsers.microbatch.error", err);
             return Promise.reject(err);
           });

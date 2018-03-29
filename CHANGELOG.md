@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.8
+- treat `unique_user_constraint` as logic error and do not throw to sentry
+
 ## 0.8.7
 - make bluebird promise global
 - fix error handling on status endpoint

@@ -58,6 +58,53 @@ describe("outgoing users traffic", function test() {
     });
   });
 
+  it("should handle unique_user_constraint error", (done) => {
+    minihull.stubUsersSegments([{ id: "s2", name: "Segment 2" }]);
+    minihull.stubConnector({
+      id: "595103c73628d081190000f6",
+      private_settings: {
+        access_token: "intercomABC",
+        synchronized_segments: ["s1"]
+      }
+    });
+    miniintercom.stubApp("GET", "/tags")
+      .respond({ tags: [] });
+    miniintercom.stubApp("POST", "/users")
+      .callsFake((req, res) => {
+        res.status(400).json({
+          errors: [{
+            code: "unique_user_constraint",
+            message: "User already exists"
+          }],
+          request_id: "b2e4g1cnanc52n24lan0",
+          type: "error.list"
+        });
+      });
+    miniintercom.stubApp("POST", "/tags")
+      .callsFake((req, res) => {
+        res.end("ok");
+      });
+
+    minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "user_report:update", {
+      user: {
+        id: "123", email: "foo@bar.com", traits_foo: "baz", "traits_intercom/tags": ["Segment 1"]
+      },
+      segments: [{ id: "s1", name: "Segment 1" }],
+      changes: {
+        traits_foo: ["bar", "baz"]
+      },
+      events: []
+    });
+
+    miniintercom.on("incoming.request@POST/tags", (req) => {
+      expect(req.body).to.eql({ name: "Segment 2" });
+    });
+
+    setTimeout(() => {
+      done();
+    }, 1000);
+  });
+
   afterEach((done) => {
     server.close(() => {
       Promise.all([
