@@ -194,6 +194,11 @@
       "url": "/status",
       "type": "cron",
       "value": "*/30 * * * *"
+    },
+    {
+      "url": "/fetch-segments",
+      "type": "interval",
+      "value": "60"
     }
   ]
 }

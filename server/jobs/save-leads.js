@@ -42,6 +42,7 @@ function saveLeads(ctx: Object, payload: Object, options: Object = {}): Promise<
 
     traits["intercom/is_lead"] = true;
     traits["intercom/lead_user_id"] = lead.user_id;
+    _.unset(traits, "intercom/user_id");
 
     const asUser = client.asUser(ident, { active: useFastlane });
 
