@@ -8,7 +8,12 @@ const oAuthRouter = require("./router/oauth");
 function server(app: express, dependencies: Object = {}): express {
   const { hostSecret, queue } = dependencies;
 
-  app.use("/", appRouter());
+  app.use("/", (err, req, res, next) => {
+    if (req.path === "/intercom" && err.message === "App not found") {
+      return res.status("410").end("Resource gone");
+    }
+    return next(err);
+  }, appRouter());
 
   app.use("/auth", oAuthRouter(dependencies));
 

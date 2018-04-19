@@ -6,19 +6,22 @@ class UserMapping {
     /* eslint-disable quote-props, no-multi-spaces, key-spacing */
     this.map = [
       {
-        "name": "email",   "hull":"email",                "type": "string", "read_only": false
+        "name": "email",   "hull":"email",                   "type": "string", "read_only": false
       },
       {
-        "name": "email",   "hull":"traits_intercom/email",                "type": "string", "read_only": false
+        "name": "email",   "hull":"traits_intercom/email",   "type": "string", "read_only": false
       },
       {
-        "name": "id",      "hull":"traits_intercom/id",   "type": "string", "read_only": true
+        "name": "id",      "hull":"traits_intercom/id",      "type": "string", "read_only": true
       },
       {
-        "name": "user_id", "hull":"external_id",          "type": "string", "read_only": false
+        "name": "user_id", "hull":"external_id",             "type": "string", "read_only": false
       },
       {
-        "name": "name",    "hull":"traits_intercom/name", "type": "string", "read_only": false
+        "name": "user_id", "hull":"traits_intercom/user_id", "type": "string", "read_only": false
+      },
+      {
+        "name": "name",    "hull":"traits_intercom/name",    "type": "string", "read_only": false
       },
 
       {
@@ -131,6 +134,7 @@ class UserMapping {
    * @return Promise
    */
   getHullTraits(intercomUser = {}) {
+    const intercomSegments = this.ship.private_settings.intercom_segments;
     const hullTraits = _.reduce(this.computeHullTraits(), (traits, prop) => {
       if (_.has(intercomUser, prop.name) && prop.hull !== "external_id") {
         traits[prop.hull.replace(/^traits_/, "")] = _.get(intercomUser, prop.name);
@@ -150,12 +154,21 @@ class UserMapping {
       });
     }
 
-    ["companies", "segments", "tags"].forEach((k) => {
+    ["companies", "tags"].forEach((k) => {
       const list = intercomUser[k] && intercomUser[k][k];
       if (list) {
         hullTraits[`intercom/${k}`] = _.uniq(_.compact(_.map(list, "name")));
       }
     });
+
+    if (intercomUser.segments && intercomUser.segments.segments) {
+      hullTraits["intercom/segments"] = _.uniq(_.compact(intercomUser.segments.segments.map((userIntercomSegment) => {
+        if (intercomSegments[userIntercomSegment]) {
+          return intercomSegments[userIntercomSegment];
+        }
+        return null;
+      })));
+    }
 
     if (!_.isEmpty(intercomUser.name)) {
       hullTraits.name = { operation: "setIfNull", value: intercomUser.name };
