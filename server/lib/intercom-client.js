@@ -117,6 +117,13 @@ class IntercomClient {
     }
     return this.agent.delete(url).query(params);
   }
+
+  getSegments() {
+    if (!this.ifConfigured()) {
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
+    }
+    return this.agent.get("/segments");
+  }
 }
 
 module.exports = IntercomClient;

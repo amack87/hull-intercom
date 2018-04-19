@@ -163,8 +163,8 @@ class UserMapping {
 
     if (intercomUser.segments && intercomUser.segments.segments) {
       hullTraits["intercom/segments"] = _.uniq(_.compact(intercomUser.segments.segments.map((userIntercomSegment) => {
-        if (intercomSegments[userIntercomSegment]) {
-          return intercomSegments[userIntercomSegment];
+        if (intercomSegments[userIntercomSegment.id]) {
+          return intercomSegments[userIntercomSegment.id];
         }
         return null;
       })));
