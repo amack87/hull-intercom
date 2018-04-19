@@ -23,6 +23,7 @@
     "yarn": "1.5.x"
   },
   "scripts": {
+    "ngrok": "ngrok http 8082 --region eu --subdomain hull-intercom",
     "build": "yarn run build:clean && yarn run build:server && yarn run build:client",
     "build:clean": "rimraf dist && rimraf build",
     "build:server": "babel server -d build",
