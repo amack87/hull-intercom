@@ -134,7 +134,7 @@ class UserMapping {
    * @return Promise
    */
   getHullTraits(intercomUser = {}) {
-    const intercomSegments = this.ship.private_settings.intercom_segments;
+    const intercomSegments = this.ship.private_settings.intercom_segments || {};
     const hullTraits = _.reduce(this.computeHullTraits(), (traits, prop) => {
       if (_.has(intercomUser, prop.name) && prop.hull !== "external_id") {
         traits[prop.hull.replace(/^traits_/, "")] = _.get(intercomUser, prop.name);
