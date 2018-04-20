@@ -1,18 +1,17 @@
-version: '2'
+version: '3'
 services:
-    npm:
-        image: node:6
-        env_file: .env
-        entrypoint: npm
-        command: run start:dev
-        ports:
-            - "$PORT:$PORT"
-        working_dir: /app
-        links:
-          - redis
-        volumes:
-            - .:/app
-    redis:
-        image: redis:3
-        ports:
-          - "6379:6379"
+  yarn:
+    image: node:8.11
+    env_file: .env
+    entrypoint: yarn
+    ports:
+      - "$PORT:$PORT"
+    working_dir: /app
+    links:
+      - redis
+    volumes:
+      - .:/app
+  redis:
+    image: redis:3
+    ports:
+      - "6379:6379"

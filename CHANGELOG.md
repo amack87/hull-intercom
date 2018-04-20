@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.9
+- upgrade nodeJS to 8.11
+- upgrade hull-node to 0.13.14
+- fetch intercom segments every hour so incoming users have the information
+- save `intercom/user_id` trait for Intercom Users
+- fix superagent throttle plugin
+- mark conflict as `outgoing.user.error`
+
 ## 0.8.8
 - treat `unique_user_constraint` as logic error and do not throw to sentry
 

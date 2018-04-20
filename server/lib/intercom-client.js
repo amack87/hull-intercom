@@ -1,12 +1,14 @@
 const Promise = require("bluebird");
 const superagent = require("superagent");
-const Throttle = require("superagent-throttle");
+const SuperagentThrottle = require("superagent-throttle");
 const prefixPlugin = require("superagent-prefix");
 const _ = require("lodash");
 
 const { superagentUrlTemplatePlugin, superagentInstrumentationPlugin } = require("hull/lib/utils");
 const superagentErrorPlugin = require("hull/lib/utils/superagent-error-plugin");
 const { ConfigurationError, RateLimitError } = require("hull/lib/errors");
+
+const throttlePool = {};
 
 class IntercomClient {
   constructor({ ship, client, metric }) {
@@ -17,12 +19,13 @@ class IntercomClient {
     this.metric = metric;
     this.ship = ship;
 
-    const throttle = new Throttle({
-      active: true,
+    throttlePool[this.ship.id] = throttlePool[this.ship.id] || new SuperagentThrottle({
       rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
       ratePer: parseInt(process.env.THROTTLE_PER_RATE || 10500, 10),
       concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
     });
+
+    const throttle = throttlePool[this.ship.id];
 
     this.agent = superagent.agent()
       .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
@@ -113,6 +116,13 @@ class IntercomClient {
       return Promise.reject(new ConfigurationError("Client access data not set!"));
     }
     return this.agent.delete(url).query(params);
+  }
+
+  getSegments() {
+    if (!this.ifConfigured()) {
+      return Promise.reject(new ConfigurationError("Client access data not set!"));
+    }
+    return this.agent.get("/segments");
   }
 }
 

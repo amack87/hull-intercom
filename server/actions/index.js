@@ -4,3 +4,4 @@ module.exports.sync = require("./sync");
 module.exports.webhook = require("./webhook");
 module.exports.fields = require("./fields");
 module.exports.statusCheck = require("./status-check");
+module.exports.fetchSegments = require("./fetch-segments");

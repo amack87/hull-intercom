@@ -7,7 +7,7 @@
   "source": "intercom",
   "logo": "logo.png",
   "picture": "picture.png",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "settings": [],
   "private_settings": [{
       "name": "access_token",
@@ -194,6 +194,11 @@
       "url": "/status",
       "type": "cron",
       "value": "*/30 * * * *"
+    },
+    {
+      "url": "/fetch-segments",
+      "type": "interval",
+      "value": "60"
     }
   ]
 }

@@ -12,6 +12,7 @@ class SyncAgent {
     this.segments = segments;
     this.intercomAgent = intercomAgent;
     this.client = client;
+    this.helpers = helpers;
     this.logger = client.logger;
 
     this.tagMapping = new TagMapping(intercomAgent, ship, helpers, this.logger);
@@ -50,6 +51,19 @@ class SyncAgent {
   userWhitelisted(user) {
     const segmentIds = _.get(this.ship, "private_settings.synchronized_segments", []);
     return _.intersection(segmentIds, user.segment_ids).length > 0;
+  }
+
+  fetchSegments() {
+    return this.intercomAgent.intercomClient.getSegments()
+      .then((response) => {
+        const intercomSegments = _.reduce(response.body.segments, (acc, value) => {
+          acc[value.id] = value.name;
+          return acc;
+        }, {});
+        return this.helpers.updateSettings({
+          intercom_segments: intercomSegments
+        });
+      });
   }
 
   /**

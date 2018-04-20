@@ -57,7 +57,7 @@ describe("Server", () => {
     it("should", (done) => {
       request
         .get("http://127.0.0.1:8070/schema/user_fields", (error, response, body) => {
-          assert(response.statusCode === 200);
+          assert.equal(response.statusCode, 200);
           assert.equal(JSON.parse(body).options.slice(-1)[0].label, "custom");
           assert.equal(JSON.parse(body).options.slice(-1)[0].value, "custom");
           done();

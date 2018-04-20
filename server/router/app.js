@@ -49,6 +49,8 @@ function appRouter(): Router {
 
   router.post("/fetch-leads", requireConfiguration, actions.fetchLeads, responseMiddleware());
 
+  router.post("/fetch-segments", requireConfiguration, actions.fetchSegments);
+
   router.get("/schema/user_fields", cors(), requireConfiguration, actions.fields);
 
   router.all("/status", actions.statusCheck);
