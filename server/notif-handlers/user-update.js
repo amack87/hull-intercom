@@ -10,6 +10,16 @@ function userUpdate(ctx, messages) {
     logger.error("connector.configuration.error", { errors: "connector is not configured" });
     return Promise.resolve();
   }
+
+  if (ctx.smartNotifierResponse) {
+    ctx.smartNotifierResponse.setFlowControl({
+      type: "next",
+      size: parseInt(process.env.USER_FLOW_CONTROL_SIZE, 10) || 100,
+      in: parseInt(process.env.USER_FLOW_CONTROL_IN, 10) || 5,
+      in_time: parseInt(process.env.USER_FLOW_CONTROL_IN_TIME, 10) || 60000
+    });
+  }
+
   const leads = [];
   const leadsToConvert = [];
   const users = messages.reduce((accumulator, message) => {

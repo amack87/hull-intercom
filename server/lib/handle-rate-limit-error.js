@@ -17,6 +17,15 @@ function handleRateLimitError(ctx: Object, jobName: String, payload: Object, err
     ctx.client.logger.warn("service.api.ratelimit", {
       message: "wait 10 seconds to retry", jobName, url, method, delay
     });
+
+    if (ctx.smartNotifierResponse) {
+      ctx.smartNotifierResponse.setFlowControl({
+        type: "retry",
+        in: delay
+      });
+      return Promise.resolve();
+    }
+
     return ctx.enqueue(jobName, payload, { delay });
   }
   return Promise.reject(err);
