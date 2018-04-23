@@ -1,5 +1,7 @@
+const { handleBatch } = require("../jobs");
+
 function batchHandler(ctx, messages) {
-  return ctx.enqueue("handleBatch", messages);
+  return handleBatch(ctx, messages);
 }
 
 module.exports = batchHandler;

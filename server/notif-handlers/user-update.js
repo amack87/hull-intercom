@@ -1,6 +1,8 @@
 const Promise = require("bluebird");
 const _ = require("lodash");
 
+const { sendUsers, sendLeads, convertLeadsToUsers } = require("../jobs");
+
 function userUpdate(ctx, messages) {
   const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
@@ -65,15 +67,15 @@ function userUpdate(ctx, messages) {
   const promises = [];
 
   if (!_.isEmpty(users)) {
-    promises.push(ctx.enqueue("sendUsers", { users }));
+    promises.push(sendUsers(ctx, { users }));
   }
 
   if (!_.isEmpty(leads)) {
-    promises.push(ctx.enqueue("sendLeads", { leads }));
+    promises.push(sendLeads(ctx, { leads }));
   }
 
   if (!_.isEmpty(leadsToConvert)) {
-    promises.push(ctx.enqueue("convertLeadsToUsers", { users: leadsToConvert }));
+    promises.push(convertLeadsToUsers(ctx, { users: leadsToConvert }));
   }
 
   return Promise.all(promises);
