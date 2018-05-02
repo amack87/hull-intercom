@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.8.11
+- add `phone` as standard writable field
+
 ## v0.8.10
 - hotfix mapping intercom segments
 
