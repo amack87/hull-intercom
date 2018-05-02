@@ -12,6 +12,9 @@ class UserMapping {
         "name": "email",   "hull":"traits_intercom/email",   "type": "string", "read_only": false
       },
       {
+        "name": "phone",   "hull":"traits_intercom/phone",   "type": "string", "read_only": false
+      },
+      {
         "name": "id",      "hull":"traits_intercom/id",      "type": "string", "read_only": true
       },
       {
