@@ -2,7 +2,7 @@
 const { Router } = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const { notifHandler, responseMiddleware } = require("hull/lib/utils");
+const { notifHandler, responseMiddleware, smartNotifierHandler } = require("hull/lib/utils");
 
 const appMiddleware = require("../lib/middleware/app-middleware");
 const requireConfiguration = require("../lib/middleware/require-configuration");
@@ -33,6 +33,15 @@ function appRouter(): Router {
       maxSize: parseInt(process.env.SNS_SIZE, 10) || 50,
       groupTraits: false
     },
+    handlers: {
+      "segment:update": notifHandlers.segmentUpdate,
+      "segment:delete": notifHandlers.segmentDelete,
+      "user:update": notifHandlers.userUpdate,
+      "ship:update": notifHandlers.shipUpdate
+    }
+  }));
+
+  router.use("/smart-notifier", smartNotifierHandler({
     handlers: {
       "segment:update": notifHandlers.segmentUpdate,
       "segment:delete": notifHandlers.segmentDelete,

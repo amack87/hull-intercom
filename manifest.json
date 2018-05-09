@@ -1,7 +1,7 @@
 {
   "name": "Intercom",
   "description": "Supercharge your engagement in Intercom",
-  "tags": ["outgoing", "incoming", "batch", "oneColumn"],
+  "tags": ["outgoing", "incoming", "batch", "oneColumn", "smart-notifier"],
   "index": "ship.js",
   "admin": "/auth/",
   "source": "intercom",
@@ -178,7 +178,7 @@
   "readme": "readme.md",
   "ui": false,
   "subscriptions": [{
-    "url": "/notify"
+    "url": "/smart-notifier"
   }],
   "schedules": [{
       "url": "/sync",

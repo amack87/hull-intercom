@@ -1,6 +1,8 @@
 const Promise = require("bluebird");
 const _ = require("lodash");
 
+const { sendUsers, sendLeads, convertLeadsToUsers } = require("../jobs");
+
 function userUpdate(ctx, messages) {
   const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
@@ -8,6 +10,16 @@ function userUpdate(ctx, messages) {
     logger.error("connector.configuration.error", { errors: "connector is not configured" });
     return Promise.resolve();
   }
+
+  if (ctx.smartNotifierResponse) {
+    ctx.smartNotifierResponse.setFlowControl({
+      type: "next",
+      size: parseInt(process.env.USER_FLOW_CONTROL_SIZE, 10) || 100,
+      in: parseInt(process.env.USER_FLOW_CONTROL_IN, 10) || 5,
+      in_time: parseInt(process.env.USER_FLOW_CONTROL_IN_TIME, 10) || 60000
+    });
+  }
+
   const leads = [];
   const leadsToConvert = [];
   const users = messages.reduce((accumulator, message) => {
@@ -65,15 +77,15 @@ function userUpdate(ctx, messages) {
   const promises = [];
 
   if (!_.isEmpty(users)) {
-    promises.push(ctx.enqueue("sendUsers", { users }));
+    promises.push(sendUsers(ctx, { users }));
   }
 
   if (!_.isEmpty(leads)) {
-    promises.push(ctx.enqueue("sendLeads", { leads }));
+    promises.push(sendLeads(ctx, { leads }));
   }
 
   if (!_.isEmpty(leadsToConvert)) {
-    promises.push(ctx.enqueue("convertLeadsToUsers", { users: leadsToConvert }));
+    promises.push(convertLeadsToUsers(ctx, { users: leadsToConvert }));
   }
 
   return Promise.all(promises);

@@ -1,7 +1,7 @@
 /* @flow */
 import type { $Response, NextFunction } from "express";
 
-function fetchLeads(req: Object, res: $Response, next: NextFunction) {
+function fetchLeadsAction(req: Object, res: $Response, next: NextFunction) {
   if (req.query.fetch_all) {
     return req.hull.enqueue("fetchAllLeads").then(next, next);
   }
@@ -11,4 +11,4 @@ function fetchLeads(req: Object, res: $Response, next: NextFunction) {
   }).then(next, next);
 }
 
-module.exports = fetchLeads;
+module.exports = fetchLeadsAction;
