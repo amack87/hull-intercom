@@ -1,8 +1,6 @@
-const { fetchUsers } = require("../jobs");
-
-function sync(req, res, next) {
-  fetchUsers(req.hull)
+function fetchUsersAction(req, res, next) {
+  req.hull.enqueue("fetchUsers")
     .then(next, next);
 }
 
-module.exports = sync;
+module.exports = fetchUsersAction;

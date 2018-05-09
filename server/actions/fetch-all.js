@@ -1,7 +1,5 @@
-const { fetchAllUsers } = require("../jobs");
-
 function fetchAll(req, res, next) {
-  fetchAllUsers(req.hull, {
+  req.hull.enqueue("fetchAllUsers", {
     updated_after: req.query.updated_after,
     updated_before: req.query.updated_before
   }).then(next, next);
