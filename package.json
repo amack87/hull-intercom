@@ -11,9 +11,18 @@
     "url": "https://github.com/hull-ships/hull-intercom/issues"
   },
   "license": "MIT",
-  "author": "Hull",
+  "author": {
+    "name": "Hull",
+    "email": "contact@hull.io",
+    "url": "https://hull.io"
+  },
   "keywords": [
     "hull",
+    "ship",
+    "connector",
+    "hull-ship",
+    "hull-connector",
+    "hull-connector-template-0.1.2",
     "intercom",
     "crm"
   ],
