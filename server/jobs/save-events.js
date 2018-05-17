@@ -11,10 +11,8 @@ function saveEvents(ctx, payload) {
   const { syncAgent } = ctx.service;
   const { events = [] } = payload;
 
-  return Promise.map(events, (event) => {
-    const {
-      user, eventName, props, context
-    } = getEventPayload(ctx, event);
+  return Promise.map(events, event => {
+    const { user, eventName, props, context } = getEventPayload(ctx, event);
 
     if (!user) {
       return Promise.resolve();
@@ -22,7 +20,11 @@ function saveEvents(ctx, payload) {
 
     let ident;
     // anonymous is set to true for intercom leads
-    if (user.anonymous === true || user.type === "lead" || user.type === "contact") {
+    if (
+      user.anonymous === true ||
+      user.type === "lead" ||
+      user.type === "contact"
+    ) {
       ident = getLeadIdent(ctx, user);
       context.active = true;
     } else {
@@ -41,13 +43,21 @@ function saveEvents(ctx, payload) {
     metric.increment("ship.incoming.events", 1);
     const asUser = client.asUser(ident);
     return asUser.track(eventName, props, context).then(
-      () => asUser.logger.info("incoming.event.success", { eventName, props, context }),
-      error => asUser.logger.error("incoming.event.error", {
-        eventName, props, context, errors: error
-      })
+      () =>
+        asUser.logger.info("incoming.event.success", {
+          eventName,
+          props,
+          context
+        }),
+      error =>
+        asUser.logger.error("incoming.event.error", {
+          eventName,
+          props,
+          context,
+          errors: error
+        })
     );
-  })
-    .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
+  }).catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
 }
 
 module.exports = saveEvents;

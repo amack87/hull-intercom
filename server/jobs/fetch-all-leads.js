@@ -11,17 +11,26 @@ function fetchAllLeads(ctx, payload = {}) {
       title: "fetchAllLeads"
     });
   }
-  return getLeadsScroll(ctx, scroll_param, updated_after, updated_before)
-    .then(({ leads, scroll_param: next_scroll_param }) => {
-      ctx.client.logger.info("incoming.job.progress", { jobName: "fetchAllLeads", next_scroll_param, progress: (leads || []).length });
+  return getLeadsScroll(ctx, scroll_param, updated_after, updated_before).then(
+    ({ leads, scroll_param: next_scroll_param }) => {
+      ctx.client.logger.info("incoming.job.progress", {
+        jobName: "fetchAllLeads",
+        next_scroll_param,
+        progress: (leads || []).length
+      });
       if (!next_scroll_param) {
         return Promise.resolve();
       }
       return Promise.all([
-        fetchAllLeads(ctx, { scroll_param: next_scroll_param, updated_after, updated_before }, { useFastlane: false }),
+        fetchAllLeads(
+          ctx,
+          { scroll_param: next_scroll_param, updated_after, updated_before },
+          { useFastlane: false }
+        ),
         saveLeads(ctx, { leads })
       ]);
-    });
+    }
+  );
 }
 
 module.exports = fetchAllLeads;

@@ -5,4 +5,3 @@ module.exports.batch = require("./batch");
 
 module.exports.segmentUpdate = require("./segment-update");
 module.exports.segmentDelete = require("./segment-delete");
-

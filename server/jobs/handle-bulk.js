@@ -6,20 +6,24 @@ const handleRateLimitError = require("../lib/handle-rate-limit-error");
 function handleBulk(ctx, payload) {
   const { id, users, attempt = 1 } = payload;
   const { syncAgent, intercomAgent } = ctx.service;
-  return intercomAgent.getJob(id)
+  return intercomAgent
+    .getJob(id)
     .then(({ isCompleted, hasErrors }) => {
       if (isCompleted) {
         ctx.metric.increment("intercom.bulk_job.attempt", attempt);
         return (() => {
           if (hasErrors) {
-            return intercomAgent.getJobErrors(id)
+            return intercomAgent
+              .getJobErrors(id)
               .then(data => syncAgent.handleUserErrors(data));
           }
           return Promise.resolve();
         })()
           .then(() => {
-            users.map((u) => {
-              return ctx.client.asUser(_.pick(u, ["id", "email", "external_id"])).logger.info("outgoing.user.success");
+            users.map(u => {
+              return ctx.client
+                .asUser(_.pick(u, ["id", "email", "external_id"]))
+                .logger.info("outgoing.user.success");
             });
           })
           .then(() => syncAgent.groupUsersToTag(users))
@@ -31,11 +35,15 @@ function handleBulk(ctx, payload) {
         return ctx.enqueue("sendUsers", { users, mode: "regular" });
       }
 
-      return ctx.enqueue("handleBulk", {
-        users,
-        id,
-        attempt: attempt + 1
-      }, { delay: attempt * (parseInt(process.env.BULK_JOB_DELAY, 10) || 10000) });
+      return ctx.enqueue(
+        "handleBulk",
+        {
+          users,
+          id,
+          attempt: attempt + 1
+        },
+        { delay: attempt * (parseInt(process.env.BULK_JOB_DELAY, 10) || 10000) }
+      );
     })
     .catch(err => handleRateLimitError(ctx, "handleBulk", payload, err));
 }

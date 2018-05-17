@@ -1,19 +1,24 @@
 /* @flow */
-const express = require("express");
+import type { $Application, NextFunction } from "express";
+
 const queueUiRouter = require("hull/lib/infra/queue/ui-router");
 
 const appRouter = require("./router/app");
 const oAuthRouter = require("./router/oauth");
 
-function server(app: express, dependencies: Object = {}): express {
+function server(app: $Application, dependencies: Object = {}): $Application {
   const { hostSecret, queue } = dependencies;
 
-  app.use("/", (err, req, res, next) => {
-    if (req.path === "/intercom" && err.message === "App not found") {
-      return res.status("410").end("Resource gone");
-    }
-    return next(err);
-  }, appRouter());
+  app.use(
+    "/",
+    (err, req, res, next: NextFunction) => {
+      if (req.path === "/intercom" && err.message === "App not found") {
+        return res.status(410).end("Resource gone");
+      }
+      return next(err);
+    },
+    appRouter()
+  );
 
   app.use("/auth", oAuthRouter(dependencies));
 

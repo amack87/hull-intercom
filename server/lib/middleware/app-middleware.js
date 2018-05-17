@@ -1,5 +1,6 @@
 /* @flow */
-import type { Request, Response, Next } from "express";
+import type { $Response, NextFunction } from "express";
+import type { HullRequest } from "hull";
 
 const Redlock = require("redlock");
 const redis = require("redis");
@@ -16,7 +17,11 @@ if (false && process.env.REDIS_URL) {
 }
 
 function appMiddleware() {
-  return function middleware(req: Request, res: Response, next: Next) {
+  return function middleware(
+    req: HullRequest,
+    res: $Response,
+    next: NextFunction
+  ) {
     req.hull.service = req.hull.service || {};
     const ctx = req.hull;
 
@@ -26,15 +31,18 @@ function appMiddleware() {
 
     const intercomClient = new IntercomClient(ctx);
     const intercomAgent = new IntercomAgent(intercomClient, ctx);
-    const syncAgent = new SyncAgent(intercomAgent, ctx.client, ctx.segments, ctx.metric, ctx.ship, ctx.helpers, ctx.hostname, ctx.cache);
-
-    req.hull.service = {
-      intercomClient,
+    const syncAgent = new SyncAgent(
       intercomAgent,
-      syncAgent
-    };
+      ctx.client,
+      ctx.segments,
+      ctx.metric,
+      ctx.ship,
+      ctx.helpers,
+      ctx.hostname,
+      ctx.cache
+    );
 
-    req.hull.lock = {
+    const lock = {
       get: function getLock(resource, ttl) {
         resource = [req.hull.ship.id, resource].join("-");
         if (redlock) {
@@ -49,6 +57,13 @@ function appMiddleware() {
         }
         return Promise.resolve();
       }
+    };
+
+    req.hull.service = {
+      intercomClient,
+      intercomAgent,
+      syncAgent,
+      lock
     };
 
     return next();
