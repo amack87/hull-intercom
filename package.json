@@ -1,6 +1,6 @@
 {
   "name": "hull-intercom",
-  "version": "0.8.11",
+  "version": "0.8.12",
   "description": "Hull Intercom integration",
   "homepage": "https://github.com/hull-ships/hull-intercom",
   "repository": {
@@ -20,7 +20,7 @@
   "engines": {
     "node": "8.11.x",
     "npm": "5.6.x",
-    "yarn": "1.5.x"
+    "yarn": "1.6.x"
   },
   "scripts": {
     "ngrok": "ngrok http 8082 --region eu --subdomain hull-intercom",
