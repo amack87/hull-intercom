@@ -98,7 +98,7 @@ class SyncAgent {
       asUser.logger.error("outgoing.user.error", { errors: errorDetails });
 
       if (errorMessage.match("Exceeded rate limit") !== null
-        || errorMessage.match("Lead Not Found") === null) {
+        || errorMessage.match("Lead Not Found") !== null) {
         return Promise.resolve();
       }
       return asUser.traits({ "intercom/import_error": errorMessage });
