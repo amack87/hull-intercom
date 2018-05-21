@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.8.12
+- do not store Lead Not Found error on trait
+
 ## v0.8.11
 - add `phone` as standard writable field
 
