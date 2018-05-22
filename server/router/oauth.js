@@ -4,11 +4,7 @@ const moment = require("moment");
 const { oAuthHandler } = require("hull/lib/utils");
 
 function oAuthRouter(dependencies: Object) {
-  const {
-    hostSecret,
-    clientID,
-    clientSecret,
-  } = dependencies;
+  const { hostSecret, clientID, clientSecret } = dependencies;
 
   return oAuthHandler({
     hostSecret,
@@ -32,9 +28,10 @@ function oAuthRouter(dependencies: Object) {
         // req.service.intercomAgent.syncContactProperties()
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
-        return client.get(ship.id).then((s) => {
-          return req.hull.service.intercomAgent.getUsersTotalCount()
-            .then((total_count) => {
+        return client.get(ship.id).then(s => {
+          return req.hull.service.intercomAgent
+            .getUsersTotalCount()
+            .then(total_count => {
               return { settings: s.private_settings, total_count };
             });
         });
@@ -44,12 +41,14 @@ function oAuthRouter(dependencies: Object) {
     onLogin: () => {
       return Promise.resolve();
     },
-    onAuthorize: (req) => {
+    onAuthorize: req => {
       const { helpers } = req.hull;
-      const { accessToken } = (req.account || {});
+      const { accessToken } = req.account || {};
       const newShip = {
         access_token: accessToken,
-        token_fetched_at: moment().utc().format("x")
+        token_fetched_at: moment()
+          .utc()
+          .format("x")
       };
       return helpers.updateSettings(newShip);
     },
@@ -58,7 +57,7 @@ function oAuthRouter(dependencies: Object) {
       home: "home.html",
       failure: "failure.html",
       success: "success.html"
-    },
+    }
   });
 }
 

@@ -1,5 +1,6 @@
 /* @flow */
-import type { Request, Response, Next } from "express";
+import type { $Response, NextFunction } from "express";
+import type { HullRequest } from "hull";
 
 /**
  * This Middleware makes sure that we have the ship configured to make
@@ -8,8 +9,16 @@ import type { Request, Response, Next } from "express";
  * @param  {Object}   res
  * @param  {Function} next
  */
-function requireConfiguration(req: Request, res: Response, next: Next) {
-  if (!req.hull.service || !req.hull.service.syncAgent || !req.hull.service.syncAgent.isConfigured()) {
+function requireConfiguration(
+  req: HullRequest,
+  res: $Response,
+  next: NextFunction
+) {
+  if (
+    !req.hull.service ||
+    !req.hull.service.syncAgent ||
+    !req.hull.service.syncAgent.isConfigured()
+  ) {
     return res.status(403).send("connector is not configured");
   }
   return next();

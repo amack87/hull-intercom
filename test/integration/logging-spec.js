@@ -35,8 +35,8 @@ describe("log error response from intercom", function test() {
     });
 
     const loggerSpy = sinon.spy();
-    Hull.logger.transports.console.level = "debug";
-    Hull.logger.add(winston.transports.SpyLogger, { level: "debug", spy: loggerSpy });
+    Hull.Client.logger.transports.console.level = "debug";
+    Hull.Client.logger.add(winston.transports.SpyLogger, { level: "debug", spy: loggerSpy });
 
     miniintercom.stubApp("/subscriptions/abc-123")
       .respond(429);
@@ -48,7 +48,7 @@ describe("log error response from intercom", function test() {
       expect(loggerSpy.callCount).to.equal(4);
       expect(loggerSpy.getCall(3).args[0]).to.equal("error");
       expect(loggerSpy.getCall(3).args[1]).to.equal("connector.notificationHandler.error");
-      Hull.logger.remove(winston.transports.SpyLogger);
+      Hull.Client.logger.remove(winston.transports.SpyLogger);
       done();
     }, 200);
   });

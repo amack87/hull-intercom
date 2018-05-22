@@ -22,7 +22,7 @@ const {
 } = process.env;
 
 if (LOG_LEVEL) {
-  Hull.logger.transports.console.level = LOG_LEVEL;
+  Hull.Client.logger.transports.console.level = LOG_LEVEL;
 }
 
 const cache = new Cache({
@@ -38,7 +38,10 @@ const adapter = new KueAdapter({
 const queue = new Queue(adapter);
 
 const connector = new Hull.Connector({
-  queue, cache, hostSecret: SECRET, port: PORT
+  queue,
+  cache,
+  hostSecret: SECRET,
+  port: PORT
 });
 const app = express();
 

@@ -4,7 +4,10 @@ const SuperagentThrottle = require("superagent-throttle");
 const prefixPlugin = require("superagent-prefix");
 const _ = require("lodash");
 
-const { superagentUrlTemplatePlugin, superagentInstrumentationPlugin } = require("hull/lib/utils");
+const {
+  superagentUrlTemplatePlugin,
+  superagentInstrumentationPlugin
+} = require("hull/lib/utils");
 const superagentErrorPlugin = require("hull/lib/utils/superagent-error-plugin");
 const { ConfigurationError, RateLimitError } = require("hull/lib/errors");
 
@@ -19,17 +22,24 @@ class IntercomClient {
     this.metric = metric;
     this.ship = ship;
 
-    throttlePool[this.ship.id] = throttlePool[this.ship.id] || new SuperagentThrottle({
-      rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
-      ratePer: parseInt(process.env.THROTTLE_PER_RATE || 10500, 10),
-      concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
-    });
+    throttlePool[this.ship.id] =
+      throttlePool[this.ship.id] ||
+      new SuperagentThrottle({
+        rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
+        ratePer: parseInt(process.env.THROTTLE_PER_RATE || 10500, 10),
+        concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
+      });
 
     const throttle = throttlePool[this.ship.id];
 
-    this.agent = superagent.agent()
-      .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
-      .use((request) => {
+    this.agent = superagent
+      .agent()
+      .use(
+        prefixPlugin(
+          process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"
+        )
+      )
+      .use(request => {
         // force superagent to return bluebird Promise all the time
         const originalThen = request.then;
         request.then = function then(resolve, reject) {
@@ -38,7 +48,7 @@ class IntercomClient {
       })
       .accept("application/json")
       .use(superagentErrorPlugin({ timeout: 60000 }))
-      .ok((res) => {
+      .ok(res => {
         if (res.status === 401) {
           throw new ConfigurationError(res.text);
         }
@@ -47,13 +57,15 @@ class IntercomClient {
         }
         return res.status < 400;
       })
-      .on("response", (res) => {
+      .on("response", res => {
         const limit = _.get(res.header, "x-ratelimit-limit");
         const remaining = _.get(res.header, "x-ratelimit-remaining");
         const reset = _.get(res.header, "x-ratelimit-reset");
         if (remaining !== undefined) {
           this.client.logger.debug("intercomClient.ratelimit", {
-            remaining, limit, reset
+            remaining,
+            limit,
+            reset
           });
           this.metric.value("ship.service_api.remaining", remaining);
         }
@@ -64,11 +76,16 @@ class IntercomClient {
       })
       .use(throttle.plugin(this.ship))
       .use(superagentUrlTemplatePlugin())
-      .use(superagentInstrumentationPlugin({ logger: this.client.logger, metric: this.metric }))
-      .use((request) => {
+      .use(
+        superagentInstrumentationPlugin({
+          logger: this.client.logger,
+          metric: this.metric
+        })
+      )
+      .use(request => {
         // error filtering
         const end = request.end;
-        request.end = (cb) => {
+        request.end = cb => {
           end.call(request, (err, res) => {
             if (err) {
               err.req = {
@@ -94,33 +111,44 @@ class IntercomClient {
   }
 
   ifConfigured() {
-    return (!_.isEmpty(this.apiKey) && !_.isEmpty(this.appId)) || !_.isEmpty(this.accessToken);
+    return (
+      (!_.isEmpty(this.apiKey) && !_.isEmpty(this.appId)) ||
+      !_.isEmpty(this.accessToken)
+    );
   }
 
   get(url, query) {
     if (!this.ifConfigured()) {
-      return Promise.reject(new ConfigurationError("Client access data not set!"));
+      return Promise.reject(
+        new ConfigurationError("Client access data not set!")
+      );
     }
     return this.agent.get(url).query(query);
   }
 
   post(url, params) {
     if (!this.ifConfigured()) {
-      return Promise.reject(new ConfigurationError("Client access data not set!"));
+      return Promise.reject(
+        new ConfigurationError("Client access data not set!")
+      );
     }
     return this.agent.post(url).send(params);
   }
 
   delete(url, params) {
     if (!this.ifConfigured()) {
-      return Promise.reject(new ConfigurationError("Client access data not set!"));
+      return Promise.reject(
+        new ConfigurationError("Client access data not set!")
+      );
     }
     return this.agent.delete(url).query(params);
   }
 
   getSegments() {
     if (!this.ifConfigured()) {
-      return Promise.reject(new ConfigurationError("Client access data not set!"));
+      return Promise.reject(
+        new ConfigurationError("Client access data not set!")
+      );
     }
     return this.agent.get("/segments");
   }

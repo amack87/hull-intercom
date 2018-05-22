@@ -7,7 +7,9 @@ function userUpdate(ctx, messages) {
   const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
   if (!syncAgent.isConfigured()) {
-    logger.error("connector.configuration.error", { errors: "connector is not configured" });
+    logger.error("connector.configuration.error", {
+      errors: "connector is not configured"
+    });
     return Promise.resolve();
   }
 
@@ -23,28 +25,46 @@ function userUpdate(ctx, messages) {
   const leads = [];
   const leadsToConvert = [];
   const users = messages.reduce((accumulator, message) => {
-    const {
-      user, changes = {}, segments = [], events = []
-    } = message;
+    const { user, changes = {}, segments = [], events = [] } = message;
     const { left = [], entered = [] } = _.get(changes, "segments", {});
 
-    ctx.client.asUser(user).logger.debug("outgoing.user.start", { changes, events: _.map(events, e => e.event), segments: _.map(segments, s => s.name) });
-    if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))
-      || !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))) {
-      ctx.client.asUser(user).logger.info("outgoing.user.skip", { reason: "User was just updated by the Intercom connector, avoiding loop" });
+    ctx.client.asUser(user).logger.debug("outgoing.user.start", {
+      changes,
+      events: _.map(events, e => e.event),
+      segments: _.map(segments, s => s.name)
+    });
+    if (
+      !_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]")) ||
+      !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))
+    ) {
+      ctx.client.asUser(user).logger.info("outgoing.user.skip", {
+        reason: "User was just updated by the Intercom connector, avoiding loop"
+      });
       return accumulator;
     }
 
-    if (ctx.ship.private_settings.skip_users_already_synced && _.get(user, "traits_intercom/id") && _.isEmpty(events)) {
-      const hullTraits = syncAgent.userMapping.computeIntercomFields().map(f => f.hull);
+    if (
+      ctx.ship.private_settings.skip_users_already_synced &&
+      _.get(user, "traits_intercom/id") &&
+      _.isEmpty(events)
+    ) {
+      const hullTraits = syncAgent.userMapping
+        .computeIntercomFields()
+        .map(f => f.hull);
       const changedTraits = _.keys(_.get(changes, "user"));
       if (_.intersection(hullTraits, changedTraits).length === 0) {
-        ctx.client.asUser(user).logger.info("outgoing.user.skip", { reason: "user already synced with Intercom, none of selected attributes were changed and no event happened" });
+        ctx.client.asUser(user).logger.info("outgoing.user.skip", {
+          reason:
+            "user already synced with Intercom, none of selected attributes were changed and no event happened"
+        });
         return accumulator;
       }
     }
 
-    user.segment_ids = _.concat(user.segment_ids || [], segments.map(s => s.id));
+    user.segment_ids = _.concat(
+      user.segment_ids || [],
+      segments.map(s => s.id)
+    );
 
     const filteredUser = syncAgent.updateUserSegments(user, {
       add_segment_ids: entered.map(s => s.id),
@@ -52,14 +72,16 @@ function userUpdate(ctx, messages) {
     });
 
     if (!filteredUser) {
-      ctx.client.asUser(user).logger.info("outgoing.user.skip", { reason: "doesn't match filtered segments" });
+      ctx.client.asUser(user).logger.info("outgoing.user.skip", {
+        reason: "doesn't match filtered segments"
+      });
       return accumulator;
     }
 
     if (
-      user["traits_intercom/is_lead"] === true
-      && user.external_id
-      && user["traits_intercom/anonymous"] === false
+      user["traits_intercom/is_lead"] === true &&
+      user.external_id &&
+      user["traits_intercom/anonymous"] === false
     ) {
       leadsToConvert.push(user);
       return accumulator;

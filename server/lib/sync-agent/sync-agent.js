@@ -7,7 +7,16 @@ const UserMapping = require("./user-mapping");
 const WebhookAgent = require("./webhook-agent");
 
 class SyncAgent {
-  constructor(intercomAgent, client, segments, metric, ship, helpers, hostname, cache) {
+  constructor(
+    intercomAgent,
+    client,
+    segments,
+    metric,
+    ship,
+    helpers,
+    hostname,
+    cache
+  ) {
     this.ship = ship;
     this.segments = segments;
     this.intercomAgent = intercomAgent;
@@ -17,7 +26,14 @@ class SyncAgent {
 
     this.tagMapping = new TagMapping(intercomAgent, ship, helpers, this.logger);
     this.userMapping = new UserMapping({ ship, client });
-    this.webhookAgent = new WebhookAgent(intercomAgent, client, ship, helpers, hostname, cache);
+    this.webhookAgent = new WebhookAgent(
+      intercomAgent,
+      client,
+      ship,
+      helpers,
+      hostname,
+      cache
+    );
   }
 
   isConfigured() {
@@ -29,41 +45,55 @@ class SyncAgent {
    * That means tags to represent segments and webhook for events capturing.
    */
   syncShip({ forceTagsResync = false } = {}) {
-    return this.webhookAgent.ensureWebhook()
+    return this.webhookAgent
+      .ensureWebhook()
       .then(() => this.tagMapping.sync(this.segments, forceTagsResync));
   }
 
   /**
    *
    */
-  userAdded(user) { // eslint-disable-line class-methods-use-this
+  userAdded(user) {
+    // eslint-disable-line class-methods-use-this
     return !_.isEmpty(user["traits_intercom/id"]);
   }
 
   /**
    * Returns true when user had permanent error, excludes "Exceeded rate limit" error
    */
-  userWithError(user) { // eslint-disable-line class-methods-use-this
-    return !_.isEmpty(user["traits_intercom/import_error"])
-      && _.get(user, "traits_intercom/import_error", "").match("Exceeded rate limit") === null;
+  userWithError(user) {
+    // eslint-disable-line class-methods-use-this
+    return (
+      !_.isEmpty(user["traits_intercom/import_error"]) &&
+      _.get(user, "traits_intercom/import_error", "").match(
+        "Exceeded rate limit"
+      ) === null
+    );
   }
 
   userWhitelisted(user) {
-    const segmentIds = _.get(this.ship, "private_settings.synchronized_segments", []);
+    const segmentIds = _.get(
+      this.ship,
+      "private_settings.synchronized_segments",
+      []
+    );
     return _.intersection(segmentIds, user.segment_ids).length > 0;
   }
 
   fetchSegments() {
-    return this.intercomAgent.intercomClient.getSegments()
-      .then((response) => {
-        const intercomSegments = _.reduce(response.body.segments, (acc, value) => {
+    return this.intercomAgent.intercomClient.getSegments().then(response => {
+      const intercomSegments = _.reduce(
+        response.body.segments,
+        (acc, value) => {
           acc[value.id] = value.name;
           return acc;
-        }, {});
-        return this.helpers.updateSettings({
-          intercom_segments: intercomSegments
-        });
+        },
+        {}
+      );
+      return this.helpers.updateSettings({
+        intercom_segments: intercomSegments
       });
+    });
   }
 
   /**
@@ -79,7 +109,7 @@ class SyncAgent {
    * @return {Promise}
    */
   handleUserErrors(errors) {
-    return Promise.map(errors, (error) => {
+    return Promise.map(errors, error => {
       if (_.get(error, "statusCode") === 429) {
         // Rate limit error
       }
@@ -97,8 +127,10 @@ class SyncAgent {
       const asUser = this.client.asUser(ident);
       asUser.logger.error("outgoing.user.error", { errors: errorDetails });
 
-      if (errorMessage.match("Exceeded rate limit") !== null
-        || errorMessage.match("Lead Not Found") !== null) {
+      if (
+        errorMessage.match("Exceeded rate limit") !== null ||
+        errorMessage.match("Lead Not Found") !== null
+      ) {
         return Promise.resolve();
       }
       return asUser.traits({ "intercom/import_error": errorMessage });
@@ -106,71 +138,96 @@ class SyncAgent {
   }
 
   getUsersToSave(users) {
-    return users.filter(u => !_.isEmpty(u.email)
-      && !this.userWithError(u))
-      .map((u) => {
+    return users
+      .filter(u => !_.isEmpty(u.email) && !this.userWithError(u))
+      .map(u => {
         u.email = _.toLower(u.email);
         return u;
       });
   }
 
   getUsersToTag(users) {
-    return users.filter(u => this.userWhitelisted(u)
-      && this.userAdded(u)
-      && !this.userWithError(u));
+    return users.filter(
+      u =>
+        this.userWhitelisted(u) && this.userAdded(u) && !this.userWithError(u)
+    );
   }
 
   groupUsersToTag(users) {
     const segments = this.segments;
-    return _.reduce(users, (o, user) => {
-      const existingUserTags = _.intersection(user["traits_intercom/tags"], segments.map(s => s.name));
+    return _.reduce(
+      users,
+      (o, user) => {
+        const existingUserTags = _.intersection(
+          user["traits_intercom/tags"],
+          segments.map(s => s.name)
+        );
 
-      const userOp = {};
-      if (!_.isEmpty(user["traits_intercom/id"])) {
-        userOp.id = user["traits_intercom/id"];
-      } else if (!_.isEmpty(user.email)) {
-        userOp.email = user.email;
-      } else {
+        const userOp = {};
+        if (!_.isEmpty(user["traits_intercom/id"])) {
+          userOp.id = user["traits_intercom/id"];
+        } else if (!_.isEmpty(user.email)) {
+          userOp.email = user.email;
+        } else {
+          return o;
+        }
+        const segmentsToAdd = _.has(user, "add_segment_ids")
+          ? user.add_segment_ids
+          : user.segment_ids;
+        segmentsToAdd.map(segment_id => {
+          const segment = _.find(segments, { id: segment_id });
+          if (_.isEmpty(segment)) {
+            this.client.logger.debug(
+              "outgoing.user.add_segment_not_found",
+              segment
+            );
+            return o;
+          }
+          if (_.includes(existingUserTags, segment.name)) {
+            this.client.logger.debug(
+              "outgoing.user.add_segment_skip",
+              segment.name
+            );
+            return null;
+          }
+          o[segment.name] = o[segment.name] || [];
+          return o[segment.name].push(userOp);
+        });
+        user.remove_segment_ids.map(segment_id => {
+          const segment = _.find(segments, { id: segment_id });
+          if (_.isEmpty(segment)) {
+            this.client.logger.debug(
+              "outgoing.user.remove_segment_not_found",
+              segment
+            );
+            return o;
+          }
+          o[segment.name] = o[segment.name] || [];
+          return o[segment.name].push(
+            _.merge({}, userOp, {
+              untag: true
+            })
+          );
+        });
         return o;
-      }
-      const segmentsToAdd = _.has(user, "add_segment_ids")
-        ? user.add_segment_ids
-        : user.segment_ids;
-      segmentsToAdd.map((segment_id) => {
-        const segment = _.find(segments, { id: segment_id });
-        if (_.isEmpty(segment)) {
-          this.client.logger.debug("outgoing.user.add_segment_not_found", segment);
-          return o;
-        }
-        if (_.includes(existingUserTags, segment.name)) {
-          this.client.logger.debug("outgoing.user.add_segment_skip", segment.name);
-          return null;
-        }
-        o[segment.name] = o[segment.name] || [];
-        return o[segment.name].push(userOp);
-      });
-      user.remove_segment_ids.map((segment_id) => {
-        const segment = _.find(segments, { id: segment_id });
-        if (_.isEmpty(segment)) {
-          this.client.logger.debug("outgoing.user.remove_segment_not_found", segment);
-          return o;
-        }
-        o[segment.name] = o[segment.name] || [];
-        return o[segment.name].push(_.merge({}, userOp, {
-          untag: true
-        }));
-      });
-      return o;
-    }, {});
+      },
+      {}
+    );
   }
 
   /**
    * When the user is within the
    * @type {Array}
    */
-  updateUserSegments(user, { add_segment_ids = [], remove_segment_ids = [] }, ignoreFilter = false) {
+  updateUserSegments(
+    user,
+    { add_segment_ids = [], remove_segment_ids = [] },
+    ignoreFilter = false
+  ) {
     if (this.userWhitelisted(user) || ignoreFilter === true) {
-      user.add_segment_ids = _.uniq(_.concat(user.segment_ids || [], _.filter(add_segment_ids)));
+      user.add_segment_ids = _.uniq(
+        _.concat(user.segment_ids || [], _.filter(add_segment_ids))
+      );
       user.remove_segment_ids = _.filter(remove_segment_ids);
     } else {
       return null;
@@ -185,8 +242,14 @@ class SyncAgent {
    * @return {Promise}
    */
   sendEvents(users) {
-    if (!this.ship.private_settings.send_events || this.ship.private_settings.send_events.length === 0) {
-      this.logger.debug("sendEvents.send_events_enabled", "No events specified.");
+    if (
+      !this.ship.private_settings.send_events ||
+      this.ship.private_settings.send_events.length === 0
+    ) {
+      this.logger.debug(
+        "sendEvents.send_events_enabled",
+        "No events specified."
+      );
       return Promise.resolve();
     }
 
@@ -194,8 +257,8 @@ class SyncAgent {
       .tap(u => this.logger.debug("sendEvents.users", u.length))
       .filter(u => !_.isUndefined(u["traits_intercom/id"]))
       .tap(u => this.logger.debug("sendEvents.users.filtered", u.length))
-      .map((u) => {
-        return _.get(u, "events", []).map((e) => {
+      .map(u => {
+        return _.get(u, "events", []).map(e => {
           e.user = {
             id: u["traits_intercom/id"]
           };
@@ -207,7 +270,7 @@ class SyncAgent {
       .filter(e => _.includes(this.ship.private_settings.send_events, e.event))
       .filter(e => e.event_source !== "intercom")
       .tap(e => this.logger.debug("sendEvents.events.filtered", e.length))
-      .map((ev) => {
+      .map(ev => {
         const data = {
           event_name: ev.event,
           created_at: moment(ev.created_at).format("X"),
@@ -219,11 +282,10 @@ class SyncAgent {
       })
       .value();
 
-    return this.intercomAgent.sendEvents(events)
-      .catch((err) => {
-        this.logger.error("outgoing.event.error", err);
-        return Promise.reject(err);
-      });
+    return this.intercomAgent.sendEvents(events).catch(err => {
+      this.logger.error("outgoing.event.error", err);
+      return Promise.reject(err);
+    });
   }
 }
 

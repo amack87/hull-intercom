@@ -6,14 +6,15 @@ function postConvertLead(ctx: Object, user: Object): Promise {
 
   client.logger.debug("outgoing.user", user);
 
-  return service.intercomClient.post("/contacts/convert", {
-    contact: { user_id: user["traits_intercom/lead_user_id"] },
-    user: { user_id: user.external_id }
-  })
-    .then((response) => {
+  return service.intercomClient
+    .post("/contacts/convert", {
+      contact: { user_id: user["traits_intercom/lead_user_id"] },
+      user: { user_id: user.external_id }
+    })
+    .then(response => {
       return response.body;
     })
-    .catch((err) => {
+    .catch(err => {
       client.logger.error("postConvertLead.error", err);
       return Promise.resolve(err);
     });

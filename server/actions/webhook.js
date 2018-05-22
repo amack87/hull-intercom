@@ -4,7 +4,10 @@ const _ = require("lodash");
 const { saveUsers, saveLeads, saveEvents } = require("../jobs");
 
 function webhook(req, res, next) {
-  req.hull.client.logger.debug("intercom message", _.pick(req.body, "id", "topic"));
+  req.hull.client.logger.debug(
+    "intercom message",
+    _.pick(req.body, "id", "topic")
+  );
   if (_.get(req, "body.topic") === "user.created") {
     // map the users to get only mapped fields
     return Batcher.getHandler("webhook", {
