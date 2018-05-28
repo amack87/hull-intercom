@@ -1,6 +1,9 @@
 
 # Changelog
 
+## v0.9.2
+- handle errors on all notifications
+
 ## v0.9.1
 - handle disabled organizations on Intercom webhook endpoint
 - handle configuration issues on outgoing traffic
