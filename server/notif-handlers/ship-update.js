@@ -1,4 +1,5 @@
 const Promise = require("bluebird");
+const { ConfigurationError } = require("hull/lib/errors");
 
 function shipUpdate(ctx) {
   const { syncAgent } = ctx.service;
@@ -9,7 +10,11 @@ function shipUpdate(ctx) {
     return Promise.resolve();
   }
 
-  return syncAgent.syncShip({ forceTagsResync: true });
+  return syncAgent
+    .syncShip({ forceTagsResync: true })
+    .catch(ConfigurationError, () => {
+      return Promise.resolve();
+    });
 }
 
 module.exports = shipUpdate;
