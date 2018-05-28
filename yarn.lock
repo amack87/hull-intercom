@@ -3290,9 +3290,9 @@ https-proxy-agent@^2.2.1:
     agent-base "^4.1.0"
     debug "^3.1.0"
 
-"hull-client@https://303-94888266-gh.circle-artifacts.com/0/hull-client-node.tgz":
-  version "2.0.0"
-  resolved "https://303-94888266-gh.circle-artifacts.com/0/hull-client-node.tgz#edb409e08265bcee083c979f2912dd0d54ad53a5"
+hull-client@2.0.0-beta.1:
+  version "2.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/hull-client/-/hull-client-2.0.0-beta.1.tgz#1a90fed75157dc34375cb0a89f2521b63561b8c9"
   dependencies:
     jwt-simple "^0.5.0"
     lodash "^4.17.5"
@@ -3301,9 +3301,9 @@ https-proxy-agent@^2.2.1:
     uuid "^3.0.1"
     winston "^2.2.0"
 
-"hull@https://825-10318703-gh.circle-artifacts.com/0/hull-node.tgz":
-  version "0.13.14"
-  resolved "https://825-10318703-gh.circle-artifacts.com/0/hull-node.tgz#2d597d4c93121883751ea67bc084ebab5bf04c41"
+hull@0.14.0-beta.1:
+  version "0.14.0-beta.1"
+  resolved "https://registry.yarnpkg.com/hull/-/hull-0.14.0-beta.1.tgz#7d705778bd8417cd34e0fb013ee6bdb5d9f65c49"
   dependencies:
     JSONStream "^1.1.2"
     aws-sdk "^2.81.0"
@@ -3320,7 +3320,7 @@ https-proxy-agent@^2.2.1:
     del "^2.2.1"
     dogapi "^2.6.0"
     ejs "^2.5.6"
-    hull-client "https://303-94888266-gh.circle-artifacts.com/0/hull-client-node.tgz"
+    hull-client "2.0.0-beta.1"
     jsonwebtoken "^7.4.3"
     jwt-simple "^0.5.0"
     kue "^0.11.5"

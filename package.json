@@ -67,7 +67,7 @@
     "ejs": "^2.4.1",
     "express": "^4.16.3",
     "happypack": "^5.0.0",
-    "hull": "https://825-10318703-gh.circle-artifacts.com/0/hull-node.tgz",
+    "hull": "0.14.0-beta.1",
     "lodash": "^4.17.5",
     "moment": "^2.19.2",
     "newrelic": "^4.0.0",
