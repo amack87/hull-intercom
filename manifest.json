@@ -178,7 +178,19 @@
   "readme": "readme.md",
   "ui": false,
   "subscriptions": [{
-    "url": "/smart-notifier"
+    "url": "/smart-notifier",
+    "conditions": {
+      "channels": {
+        "only": [
+          "user:update",
+          "ship:update",
+          "users_segment:update",
+          "accounts_segment:update",
+          "segment:update",
+          "segment:delete"
+        ]
+      }
+    }
   }],
   "schedules": [{
       "url": "/sync",
