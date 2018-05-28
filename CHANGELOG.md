@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.9.0
+- migrated to smart-notifier/kraken version of notifications
+
 ## v0.8.12
 - do not store Lead Not Found error on trait
 
