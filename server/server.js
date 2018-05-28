@@ -12,7 +12,7 @@ function server(app: $Application, dependencies: Object = {}): $Application {
   app.use(
     "/",
     (err, req, res, next: NextFunction) => {
-      if (req.path === "/intercom" && err.message === "App not found") {
+      if (req.path === "/intercom" && (err.message === "App not found" || err.message === "Payment Required")) {
         return res.status(410).end("Resource gone");
       }
       return next(err);

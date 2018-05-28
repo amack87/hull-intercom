@@ -1,5 +1,6 @@
 // @flow
 const Promise = require("bluebird");
+const { ConfigurationError } = require("hull/lib/errors");
 
 const postConvertLead = require("../lib/lead/post-convert-lead");
 
@@ -21,6 +22,9 @@ function convertLeadsToUsers(ctx: Object, payload: Object): Promise {
           });
         }
         return Promise.reject(fErr);
+      })
+      .catch(ConfigurationError, () => {
+        return Promise.resolve();
       });
   });
 }

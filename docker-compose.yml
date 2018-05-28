@@ -4,6 +4,7 @@ services:
     image: node:8.11
     env_file: .env
     entrypoint: yarn
+    command: run start:dev
     ports:
       - "$PORT:$PORT"
     working_dir: /app

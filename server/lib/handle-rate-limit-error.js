@@ -35,7 +35,8 @@ function handleRateLimitError(
     if (ctx.smartNotifierResponse) {
       ctx.smartNotifierResponse.setFlowControl({
         type: "retry",
-        in: delay
+        in: delay,
+        size: parseInt(process.env.USER_FLOW_CONTROL_SIZE, 10) || 100
       });
       return Promise.resolve();
     }

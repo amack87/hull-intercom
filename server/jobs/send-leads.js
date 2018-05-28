@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const { ConfigurationError } = require("hull/lib/errors");
 
 const postLeads = require("../lib/lead/post-leads");
 
@@ -60,6 +61,9 @@ function sendLeads(ctx, payload) {
         .then(() => syncAgent.groupUsersToTag(savedleads))
         .then(groupedleads => intercomAgent.tagUsers(groupedleads))
         .then(() => syncAgent.handleUserErrors(groupedErrors));
+    })
+    .catch(ConfigurationError, () => {
+      return Promise.resolve();
     });
 }
 
