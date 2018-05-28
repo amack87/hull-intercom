@@ -1,4 +1,9 @@
+
 # Changelog
+
+## v0.9.1
+- handle disabled organizations on Intercom webhook endpoint
+- handle configuration issues on outgoing traffic
 
 ## v0.9.0
 - migrated to smart-notifier/kraken version of notifications

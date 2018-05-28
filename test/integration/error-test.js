@@ -51,6 +51,16 @@ describe("intercom error responses", function test() {
     });
   });
 
+  it("should handle disabled organization", () => {
+    minihull.stubApp("/api/v1/595103c73628d081190000f6").respond(402);
+    minihull.stubApp("/api/v1/app").respond(402);
+    return minihull.postConnector("595103c73628d081190000f6", "http://localhost:8000/intercom")
+      .send()
+      .catch((err) => {
+        expect(err.status).to.equal(410);
+      });
+  });
+
   afterEach((done) => {
     server.close(() => {
       Promise.all([
