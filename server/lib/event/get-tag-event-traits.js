@@ -1,12 +1,16 @@
 // @flow
 const _ = require("lodash");
 
-function getTagEventTraits(ctx: Object, user: Object, allTags: Array<Object>): Object {
-  const tags = user.tags.tags.map((t) => {
-    if (!t.name) {
+function getTagEventTraits(
+  ctx: Object,
+  user: Object,
+  allTags: Array<Object>
+): Object {
+  const tags = user.tags.tags.map(t => {
+    if ((!t || !t.name) && t && t.id) {
       t = _.find(allTags, { id: t.id });
     }
-    if (!t.name) {
+    if (!t || !t.name) {
       ctx.client.logger.debug("incoming.event.tagNotFound");
       return "";
     }

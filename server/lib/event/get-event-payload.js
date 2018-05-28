@@ -6,7 +6,7 @@ const mapping = [
     intercom: "conversation.user.created",
     eventName: "User started conversation",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
         message: _.get(event, "data.item.conversation_message.body"),
         link: _.get(event, "data.item.links.conversation_web"),
@@ -16,7 +16,7 @@ const mapping = [
         initiated: "user"
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "conversation"
@@ -27,9 +27,12 @@ const mapping = [
     intercom: "conversation.user.replied",
     eventName: "User replied to conversation",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
-        message: _.get(event, "data.item.conversation_parts.conversation_parts[0].body"),
+        message: _.get(
+          event,
+          "data.item.conversation_parts.conversation_parts[0].body"
+        ),
         link: _.get(event, "data.item.links.conversation_web"),
         assignee_name: _.get(event, "data.item.assignee.name"),
         assignee_email: _.get(event, "data.item.assignee.email"),
@@ -37,7 +40,7 @@ const mapping = [
         initiated: "user"
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "conversation"
@@ -48,9 +51,12 @@ const mapping = [
     intercom: "conversation.admin.replied",
     eventName: "Admin replied to conversation",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
-        message: _.get(event, "data.item.conversation_parts.conversation_parts[0].body"),
+        message: _.get(
+          event,
+          "data.item.conversation_parts.conversation_parts[0].body"
+        ),
         link: _.get(event, "data.item.links.conversation_web"),
         assignee_name: _.get(event, "data.item.assignee.name"),
         assignee_email: _.get(event, "data.item.assignee.email"),
@@ -58,7 +64,7 @@ const mapping = [
         initiated: "admin"
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "conversation"
@@ -69,7 +75,7 @@ const mapping = [
     intercom: "conversation.admin.single.created",
     eventName: "Admin started conversation",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
         message: _.get(event, "data.item.conversation_message.body"),
         link: _.get(event, "data.item.links.conversation_web"),
@@ -79,7 +85,7 @@ const mapping = [
         initiated: "admin"
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "conversation"
@@ -90,14 +96,14 @@ const mapping = [
     intercom: "conversation.admin.assigned",
     eventName: "Admin assigned conversation",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
         to: _.get(event, "data.item.user.id"),
         admin: _.get(event, "data.item.assignee.id"),
         initiated: "admin"
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "conversation"
@@ -108,12 +114,12 @@ const mapping = [
     intercom: "conversation.admin.closed",
     eventName: "Admin closed conversation",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
         admin: _.get(event, "data.item.assignee.id")
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "conversation"
@@ -124,12 +130,12 @@ const mapping = [
     intercom: "conversation.admin.opened",
     eventName: "Admin opened conversation",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
         admin: _.get(event, "data.item.assignee.id")
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "conversation"
@@ -140,12 +146,12 @@ const mapping = [
     intercom: "user.tag.created",
     eventName: "Added Tag",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
-        tag: _.get(event, "data.item.tag.name"),
+        tag: _.get(event, "data.item.tag.name")
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "tag"
@@ -156,12 +162,12 @@ const mapping = [
     intercom: "user.tag.deleted",
     eventName: "Removed Tag",
     user: event => _.get(event, "data.item.user"),
-    props: (event) => {
+    props: event => {
       return {
-        tag: _.get(event, "data.item.tag.name"),
+        tag: _.get(event, "data.item.tag.name")
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.user.last_seen_ip", "0"),
         event_type: "tag"
@@ -172,10 +178,10 @@ const mapping = [
     intercom: "user.unsubscribed",
     eventName: "Unsubscribed from emails",
     user: event => _.get(event, "data.item"),
-    props: (_event) => {
+    props: () => {
       return {};
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.last_seen_ip", "0"),
         event_type: "email"
@@ -186,12 +192,12 @@ const mapping = [
     intercom: "user.email.updated",
     eventName: "Updated email address",
     user: event => _.get(event, "data.item"),
-    props: (event) => {
+    props: event => {
       return {
-        email: _.get(event, "data.item.email"),
+        email: _.get(event, "data.item.email")
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.last_seen_ip", "0"),
         event_type: "email"
@@ -202,12 +208,12 @@ const mapping = [
     intercom: "contact.added_email",
     eventName: "Updated email address",
     user: event => _.get(event, "data.item"),
-    props: (event) => {
+    props: event => {
       return {
-        email: _.get(event, "data.item.email"),
+        email: _.get(event, "data.item.email")
       };
     },
-    context: (event) => {
+    context: event => {
       return {
         ip: _.get(event, "data.item.last_seen_ip", "0"),
         event_type: "email"
@@ -222,7 +228,10 @@ function getEventPayload(ctx: Object, intercomEvent: Object): Object {
     return {};
   }
 
-  if (intercomEvent.topic === "user.email.updated" && _.get(intercomEvent, "data.item.type") === "contact") {
+  if (
+    intercomEvent.topic === "user.email.updated" &&
+    _.get(intercomEvent, "data.item.type") === "contact"
+  ) {
     return {};
   }
 
@@ -233,12 +242,17 @@ function getEventPayload(ctx: Object, intercomEvent: Object): Object {
   });
   const context = _.defaults(mappedEvent.context(intercomEvent), {
     source: "intercom",
-    event_id: [user.id, intercomEvent.topic, intercomEvent.created_at].join("-"),
-    created_at: intercomEvent.created_at,
+    event_id: [user.id, intercomEvent.topic, intercomEvent.created_at].join(
+      "-"
+    ),
+    created_at: intercomEvent.created_at
   });
 
   return {
-    user, eventName, props, context
+    user,
+    eventName,
+    props,
+    context
   };
 }
 

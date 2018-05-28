@@ -38,12 +38,10 @@ class TagMapping {
     if (!_.isNil(this._tags)) {
       return Promise.resolve(this._tags);
     }
-    return this.intercomClient
-      .get("/tags")
-      .then(({ body = {} }) => {
-        this._tags = body.tags;
-        return body.tags;
-      });
+    return this.intercomClient.get("/tags").then(({ body = {} }) => {
+      this._tags = body.tags;
+      return body.tags;
+    });
   }
 
   /**
@@ -51,15 +49,21 @@ class TagMapping {
    * @return Promise
    */
   sync(segments = [], forceTagsResync = false) {
-    const mappedSegments = _.keys(this.mapping).map((id) => { return { id }; });
-    const newSegments = forceTagsResync === true
-      ? segments
-      : _.differenceBy(segments, mappedSegments, "id");
+    const mappedSegments = _.keys(this.mapping).map(id => {
+      return { id };
+    });
+    const newSegments =
+      forceTagsResync === true
+        ? segments
+        : _.differenceBy(segments, mappedSegments, "id");
 
-    return Promise.map(newSegments, (segment) => {
-      return this.createTag(segment);
-    }, { concurrency: 1 })
-      .then(() => this.persist());
+    return Promise.map(
+      newSegments,
+      segment => {
+        return this.createTag(segment);
+      },
+      { concurrency: 1 }
+    ).then(() => this.persist());
   }
 
   /**
@@ -70,31 +74,29 @@ class TagMapping {
    */
   createTag(segment) {
     const { id, name } = segment;
-    return this.findTag(segment)
-      .then((foundTag) => {
-        if (!_.isUndefined(foundTag)) {
-          this.mapping[id] = foundTag.id;
-          return foundTag;
-        }
-        return this.intercomClient
-          .post("/tags", { name })
-          .then(({ body = {} }) => {
-            this.mapping[id] = body.id;
-            return body;
-          });
-      });
+    return this.findTag(segment).then(foundTag => {
+      if (!_.isUndefined(foundTag)) {
+        this.mapping[id] = foundTag.id;
+        return foundTag;
+      }
+      return this.intercomClient
+        .post("/tags", { name })
+        .then(({ body = {} }) => {
+          this.mapping[id] = body.id;
+          return body;
+        });
+    });
   }
 
   findTag(segment) {
     const { name } = segment;
-    return this.getTags()
-      .then((tags) => {
-        const tag = _.find(tags, { name: _.trim(name) });
-        if (_.isUndefined(tag)) {
-          return undefined;
-        }
-        return tag;
-      });
+    return this.getTags().then(tags => {
+      const tag = _.find(tags, { name: _.trim(name) });
+      if (_.isUndefined(tag)) {
+        return undefined;
+      }
+      return tag;
+    });
   }
 
   /**
@@ -120,7 +122,7 @@ class TagMapping {
         _.unset(this.mapping, segment.id);
         return Promise.resolve();
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.statusCode === 404) {
           _.unset(this.mapping, segment.id);
           return Promise.resolve();

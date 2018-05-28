@@ -6,7 +6,7 @@ const postConvertLead = require("../lib/lead/post-convert-lead");
 function convertLeadsToUsers(ctx: Object, payload: Object): Promise {
   const { users } = payload;
 
-  return Promise.map(users, (user) => {
+  return Promise.map(users, user => {
     const ident = { id: user.id };
     return postConvertLead(ctx, user)
       .then(() => {
@@ -14,7 +14,7 @@ function convertLeadsToUsers(ctx: Object, payload: Object): Promise {
           "intercom/is_lead": false
         });
       })
-      .catch((fErr) => {
+      .catch(fErr => {
         if (fErr.statusCode === 404) {
           return ctx.client.asUser(ident).traits({
             "intercom/is_lead": false

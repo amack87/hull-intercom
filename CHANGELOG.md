@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.0
+- migrated to smart-notifier/kraken version of notifications
+- applied hull-connector-template
+- prettified the code
+- upgraded dependecies
+- upgraded front-end building stack
+
 ## v0.8.12
 - do not store Lead Not Found error on trait
 
