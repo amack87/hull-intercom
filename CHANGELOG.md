@@ -1,6 +1,9 @@
 
 # Changelog
 
+## v0.9.3
+- handle `not_restorable` error code
+
 ## v0.9.2
 - handle errors on all notifications
 
