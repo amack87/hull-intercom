@@ -237,6 +237,7 @@ function getEventPayload(ctx: Object, intercomEvent: Object): Object {
 
   const user = mappedEvent.user(intercomEvent);
   const { eventName } = mappedEvent;
+  // $FlowFixMe
   const props = _.defaults(mappedEvent.props(intercomEvent), {
     topic: intercomEvent.topic
   });

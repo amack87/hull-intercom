@@ -121,12 +121,11 @@ class IntercomAgent {
             })
             .catch(err => {
               if (
-                _.get(err, "body.errors[0].code") === "unique_user_constraint"
+                _.get(err, "body.errors[0].code") ===
+                  "unique_user_constraint" ||
+                _.get(err, "body.errors[0].code") === "conflict" ||
+                _.get(err, "body.errors[0].code") === "not_restorable"
               ) {
-                return err;
-              }
-
-              if (_.get(err, "body.errors[0].code") === "conflict") {
                 return err;
               }
               this.logger.error(
