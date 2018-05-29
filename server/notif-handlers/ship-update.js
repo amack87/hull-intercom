@@ -13,7 +13,8 @@ function shipUpdate(ctx) {
   if (ctx.smartNotifierResponse) {
     ctx.smartNotifierResponse.setFlowControl({
       type: "next",
-      size: 10
+      size: 10,
+      in: 10
     });
   }
 
