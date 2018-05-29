@@ -1,6 +1,9 @@
 
 # Changelog
 
+## v0.9.4
+- `ship:update` responds with flow size of 10
+
 ## v0.9.3
 - handle `not_restorable` error code
 

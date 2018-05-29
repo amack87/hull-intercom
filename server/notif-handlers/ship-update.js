@@ -10,6 +10,13 @@ function shipUpdate(ctx) {
     return Promise.resolve();
   }
 
+  if (ctx.smartNotifierResponse) {
+    ctx.smartNotifierResponse.setFlowControl({
+      type: "next",
+      size: 10
+    });
+  }
+
   return syncAgent
     .syncShip({ forceTagsResync: true })
     .catch(ConfigurationError, () => {
