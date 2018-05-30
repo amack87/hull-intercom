@@ -1,6 +1,9 @@
 
 # Changelog
 
+## v0.9.6
+- handle `not_found` error code
+
 ## v0.9.5
 - missing `in` param
 
