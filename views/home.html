@@ -32,8 +32,12 @@
             <p>The Intercom's custom attributes will appear in settings dropdowns after first users are processed. Use the "Fetch All" button below to start the processing.</p>
           <% } %>
 
-          <% if (total_count) { %>
-          <h5>Users to fetch <small class="pull-right"><strong><%=total_count || 0%></strong></small></h5>
+          <% if (users_total_count) { %>
+          <h5>Users to fetch <small class="pull-right"><strong><%=users_total_count || 0%></strong></small></h5>
+          <% } %>
+
+          <% if (contacts_total_count) { %>
+          <h5>Leads to fetch <small class="pull-right"><strong><%=contacts_total_count || 0%></strong></small></h5>
           <% } %>
 
           <hr>
