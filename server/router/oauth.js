@@ -29,11 +29,16 @@ function oAuthRouter(dependencies: Object) {
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
         return client.get(ship.id).then(s => {
-          return req.hull.service.intercomAgent
-            .getUsersTotalCount()
-            .then(total_count => {
-              return { settings: s.private_settings, total_count };
-            });
+          return Promise.all([
+            req.hull.service.intercomAgent.getUsersTotalCount(),
+            req.hull.service.intercomAgent.intercomClient.getContactsTotalCount()
+          ]).then(([usersTotalCount, contactsTotalCount]) => {
+            return {
+              settings: s.private_settings,
+              users_total_count: usersTotalCount,
+              contacts_total_count: contactsTotalCount
+            };
+          });
         });
       }
       return Promise.reject();

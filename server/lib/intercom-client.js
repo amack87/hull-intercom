@@ -152,6 +152,20 @@ class IntercomClient {
     }
     return this.agent.get("/segments");
   }
+
+  /**
+   * get total count of users
+   */
+  getContactsTotalCount() {
+    return this.get("/contacts", { per_page: 1 })
+      .then(response => {
+        return _.get(response, "body.total_count");
+      })
+      .catch(err => {
+        this.logger.error("getContactsTotalCount.error", err);
+        return Promise.reject(err);
+      });
+  }
 }
 
 module.exports = IntercomClient;
