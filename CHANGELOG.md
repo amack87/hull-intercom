@@ -1,6 +1,10 @@
 
 # Changelog
 
+## v0.9.10
+- made the oauth flow and actions button in new manifest.json schema and in small modal box instead of full screen
+- add leads count on the `Actions` pane
+
 ## v0.9.6
 - handle `not_found` error code
 
