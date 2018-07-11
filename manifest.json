@@ -3,7 +3,14 @@
   "description": "Supercharge your engagement in Intercom",
   "tags": ["outgoing", "incoming", "batch", "oneColumn", "smart-notifier"],
   "index": "ship.js",
-  "admin": "/auth/",
+  "tabs": [
+    {
+      "title": "Workspace",
+      "url": "/auth/",
+      "size": "small",
+      "editable": false
+    }
+  ],
   "source": "intercom",
   "logo": "logo.png",
   "picture": "picture.png",
