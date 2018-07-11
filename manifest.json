@@ -5,7 +5,7 @@
   "index": "ship.js",
   "tabs": [
     {
-      "title": "Workspace",
+      "title": "Actions",
       "url": "/auth/",
       "size": "small",
       "editable": false
