@@ -5,7 +5,7 @@
   "index": "ship.js",
   "tabs": [
     {
-      "title": "Credentials",
+      "title": "Actions",
       "url": "/auth/",
       "size": "small",
       "editable": false
