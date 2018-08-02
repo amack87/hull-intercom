@@ -1,6 +1,9 @@
 
 # Changelog
 
+## v0.9.11
+- do not retry whole notification on single `server_error` when upserting users
+
 ## v0.9.10
 - made the oauth flow and actions button in new manifest.json schema and in small modal box instead of full screen
 - add leads count on the `Actions` pane

@@ -125,7 +125,8 @@ class IntercomAgent {
                   "unique_user_constraint" ||
                 _.get(err, "body.errors[0].code") === "conflict" ||
                 _.get(err, "body.errors[0].code") === "not_restorable" ||
-                _.get(err, "body.errors[0].code") === "not_found"
+                _.get(err, "body.errors[0].code") === "not_found" ||
+                _.get(err, "body.errors[0].code") === "server_error"
               ) {
                 return err;
               }
