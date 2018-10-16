@@ -114,9 +114,18 @@ class IntercomAgent {
       return Promise.map(
         body.items,
         item => {
+          const start = process.hrtime();
           return this.intercomClient
             .post("/users", item.data)
             .then(response => {
+              const hrTime = process.hrtime(start);
+              const elapsed = (hrTime[0] * 1000) + (hrTime[1] / 1000000);
+              if (elapsed > 1000) {
+                this.logger.debug(
+                  "intercomAgent.sendUsers.slowResponse",
+                  { data: item.data, response }
+                )
+              }
               return response.body;
             })
             .catch(err => {
