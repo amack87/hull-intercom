@@ -123,7 +123,7 @@ class IntercomAgent {
               if (elapsed > 10000) {
                 this.logger.debug(
                   "intercomAgent.sendUsers.slowResponse",
-                  { data: item.data, response }
+                  JSON.stringify(item.data)
                 )
               }
               return response.body;
