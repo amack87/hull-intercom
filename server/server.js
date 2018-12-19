@@ -14,7 +14,7 @@ function server(app: $Application, dependencies: Object = {}): $Application {
     (err, req, res, next: NextFunction) => {
       if (
         req.path === "/intercom" &&
-        (err.message === "App not found" || err.message === "Payment Required")
+        (err.message === "App not found" || err.message === "Payment Required" || err.message === "Not Found")
       ) {
         return res.status(410).end("Resource gone");
       }
