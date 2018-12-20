@@ -1,6 +1,6 @@
 {
   "name": "hull-intercom",
-  "version": "0.9.11",
+  "version": "0.9.12",
   "description": "Hull Intercom integration",
   "homepage": "https://github.com/hull-ships/hull-intercom",
   "repository": {
@@ -67,7 +67,7 @@
     "ejs": "^2.4.1",
     "express": "^4.16.3",
     "happypack": "^5.0.0",
-    "hull": "0.14.0-beta.1",
+    "hull": "0.14.0-beta.1.1",
     "lodash": "^4.17.5",
     "moment": "^2.19.2",
     "newrelic": "^4.0.0",

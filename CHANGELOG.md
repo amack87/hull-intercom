@@ -1,6 +1,10 @@
 
 # Changelog
 
+## v0.9.12
+- in case of webhook call handle correct error when connector was not found
+- fix handling batch extracts with big payload
+
 ## v0.9.11
 - do not retry whole notification on single `server_error` when upserting users
 
