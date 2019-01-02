@@ -1,6 +1,9 @@
 
 # Changelog
 
+## v0.9.13
+- do not store `last_seen_at` as top level trait
+
 ## v0.9.12
 - in case of webhook call handle correct error when connector was not found
 - fix handling batch extracts with big payload
